@@ -48,8 +48,10 @@ namespace ToolsForHaul
         protected override IEnumerable<Toil> MakeNewToils()
         {
             Apparel_Backpack backpack = CurJob.GetTarget(CarrierInd).Thing as Apparel_Backpack;
-            Thing lastItem = pawn.inventory.container.Last();
-
+            Thing lastItem = null;
+            if (pawn.inventory.container != null && pawn.inventory.container.Count > 0)
+                lastItem = pawn.inventory.container.Last();
+            //Thing lastItem = CurJob.targetA.Thing;
             ///
             //Set fail conditions
             ///

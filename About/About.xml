@@ -12,6 +12,9 @@
   - Backpack for hauling
 		
   Change Log
+  V1.4b
+  - Backpack bug is fixed. After just starting game and picking up backpack, error is occured.
+  
   V1.4a
   - Backpack gizmo's drop floating menu bug is fixed. It was made disappear equipment try to drop.
   - Backpack is now used for hauling. Priority of using tool is Backpack - Cart - Hand.
