@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Mountable -->
+  <MountOn>{0} 승차</MountOn>
+  <Dismount>{0} 하차</Dismount>
+  <DropIt>내려놓기</DropIt>
+  <Deconstruct>{0} 해체하기</Deconstruct>
+  
+</LanguageData>

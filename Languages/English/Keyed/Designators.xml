@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  
+  <!-- Backpack -->
+  <DesignatorPutInDefaultLabel>Put in</DesignatorPutInDefaultLabel>
+  <DesignatorPutInDefaultDesc>Put in inventory. Capacity: </DesignatorPutInDefaultDesc>
+  
+  <!-- Failure messages -->
+  <CannotMount>Must designate pawn can mount.</CannotMount>
+  <NoNeedTreatment>Must designate pawn needed treatment.</NoNeedTreatment>
+  <BackpackIsFull>BackPack has been Full.</BackpackIsFull>
+  <InvalidPutInTarget>Must designate item can be hauled</InvalidPutInTarget>
+  <NoDoctor>Colonist is not doctor</NoDoctor>
+  <CannotEatAnymore>Colonist don't want to eat anymore</CannotEatAnymore>
+
+</LanguageData>

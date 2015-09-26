@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<KeyBindingDefs>
+
+  <KeyBindingDef Name="SelectionSpecialKeyBinding" Abstract="true">
+    <category>SelectionSpecial</category>
+  </KeyBindingDef>
+
+  <KeyBindingDef ParentName="SelectionSpecialKeyBinding">
+    <defName>CommandToggleIgnoreForbidden</defName>
+    <label>toggle forbidden</label>
+    <defaultKeyCodeA>G</defaultKeyCodeA>
+  </KeyBindingDef>
+
+  <KeyBindingDef ParentName="SelectionSpecialKeyBinding">
+    <defName>CommandPutInInventory</defName>
+    <label>put item in inventory </label>
+    <defaultKeyCodeA>V</defaultKeyCodeA>
+  </KeyBindingDef>
+
+</KeyBindingDefs>

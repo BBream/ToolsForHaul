@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<JobDefs>
+
+  <!--============= Backpack ===============-->
+
+  <JobDef>
+    <defName>PutInInventory</defName>
+    <driverClass>ToolsForHaul.JobDriver_PutInInventory</driverClass>
+    <reportString>Put TargetB in TargetA.</reportString>
+  </JobDef>
+
+  <JobDef>
+    <defName>ApplyMedicine</defName>
+    <driverClass>ToolsForHaul.JobDriver_ApplyMedicine</driverClass>
+    <reportString>Treating TargetA.</reportString>
+  </JobDef>
+  
+  <!--============= Item hauling ===============-->
+
+  <JobDef>
+    <defName>HaulWithBackpack</defName>
+    <driverClass>ToolsForHaul.JobDriver_HaulWithBackpack</driverClass>
+    <reportString>Collecting TargetA.</reportString>
+  </JobDef>
+
+  <JobDef>
+    <defName>HaulWithCart</defName>
+    <driverClass>ToolsForHaul.JobDriver_HaulWithCart</driverClass>
+    <reportString>Collecting TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>DismountInBase</defName>
+    <driverClass>ToolsForHaul.JobDriver_DismountInBase</driverClass>
+    <reportString>Dismount TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>Mount</defName>
+    <driverClass>ToolsForHaul.JobDriver_Mount</driverClass>
+    <reportString>Mount on TargetA.</reportString>
+  </JobDef>
+  
+<!-- 
+  <JobDef>
+    <defName>CollectThing</defName>
+    <driverClass>ToolsForHaul.JobDriver_CollectThing</driverClass>
+    <reportString>Collecting TargetA.</reportString>
+  </JobDef>
+
+  <JobDef>
+    <defName>DropAllInCell</defName>
+    <driverClass>ToolsForHaul.JobDriver_DropAllInCell</driverClass>
+    <reportString>DropAllIn TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>DropInCell</defName>
+    <driverClass>ToolsForHaul.JobDriver_DropInCell</driverClass>
+    <reportString>DropIn TargetA.</reportString>
+  </JobDef> 
+-->
+  
+</JobDefs>

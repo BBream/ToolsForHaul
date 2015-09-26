@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<LanguageData>
+  
+	<CommandToggleIgnoreForbidden.label>상호작용 설정</CommandToggleIgnoreForbidden.label>
+	<CommandPutInInventory.label>가방에 물건 넣기</CommandPutInInventory.label>
+	<CommandSwitchEquipFromInventory.label>가방 장비 장착</CommandSwitchEquipFromInventory.label>
+
+</LanguageData>

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Mountable -->
+  <MountOn>Mount {0}</MountOn>
+  <Dismount>Dismount {0}</Dismount>
+  <DropIt>Drop it</DropIt>
+  
+  <!-- Vehicle -->
+  <Deconstruct>Deconstruct {0}</Deconstruct>
+  
+</LanguageData>

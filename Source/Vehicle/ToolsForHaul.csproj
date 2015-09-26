@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D8E37818-F1A0-4C90-930D-4F04B21614E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ToolsForHaul</RootNamespace>
+    <AssemblyName>ToolsForHaul</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Assemblies\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\RimWorld914Win_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\RimWorld914Win_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Apparel_Backpack.cs" />
+    <Compile Include="CompMountable.cs" />
+    <Compile Include="Designator_ApplyMedicine.cs" />
+    <Compile Include="Designator_InstallForBackpack.cs" />
+    <Compile Include="Designator_Mount.cs" />
+    <Compile Include="Designator_PutInInventory.cs" />
+    <Compile Include="Gizmo_BackpackEquipment.cs" />
+    <Compile Include="ITab_Pawn_VehicleGear.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ITab_Vehicle_Storage.cs" />
+    <Compile Include="JobDriver_ApplyMedicine.cs" />
+    <Compile Include="JobDriver_HaulWithCart.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JobDriver_DismountInBase.cs" />
+    <Compile Include="JobDriver_HaulWithBackpack.cs" />
+    <Compile Include="JobDriver_Mount.cs" />
+    <Compile Include="JobDriver_PutInInventory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Toils_Collect.cs" />
+    <Compile Include="Vehicle_Cart.cs" />
+    <Compile Include="WorkGiver_DismountInBase.cs" />
+    <Compile Include="WorkGiver_HaulWithBackpack.cs" />
+    <Compile Include="WorkGiver_HaulWithCart.cs" />
+    <Compile Include="WorkGiver_Store.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

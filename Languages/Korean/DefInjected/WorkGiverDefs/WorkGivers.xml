@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+		<HaulWithCargo.verb>도구로 운반</HaulWithCargo.verb>
+		<HaulWithCargo.gerund>도구로 운반</HaulWithCargo.gerund>
+
+		<DismountInBase.verb>운반</DismountInBase.verb>
+		<DismountInBase.gerund>운반</DismountInBase.gerund>
+</LanguageData>

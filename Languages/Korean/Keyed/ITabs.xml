@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- ITab titles -->
+  <TabVehicleGear>장비</TabVehicleGear>
+
+  <!-- Vehicle gear -->
+  <Driver>운전수<Driver>
+  <Storage>물품<Storage>
+
+</LanguageData>

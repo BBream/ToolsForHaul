@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Mountable -->
+	<CommandDismountLabel>하차</CommandDismountLabel>
+	<CommandDismountDesc>탑승한 차량에서 하차합니다.</CommandDismountDesc>
+
+	<CommandMountLabel>승차</CommandMountLabel>
+	<CommandMountDesc>빈 차량에 탑승합니다.</CommandMountDesc>
+
+  <!-- Backpack Gizmo -->
+  <NoItem>물건 없음</NoItem>
+
+</LanguageData>

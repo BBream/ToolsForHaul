@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<LanguageData>
+
+	<PutInInventory.reportString>TargetB(을)를 TargetA에 넣는 중.</PutInInventory.reportString>
+  <ApplyMedicine.reportString>TargetA 치료 중.</ApplyMedicine.reportString>
+
+	<!--============= Item hauling ===============-->
+	<Collect.reportString>TargetA 모으는 중.</Collect.reportString>
+	<Mount.reportString>TargetA 승차 중.</Mount.reportString>
+	<DismountInBase.reportString>TargetA 하차 중.</DismountInBase.reportString>
+
+</LanguageData>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- ITab titles -->
+  <TabVehicleGear>Gear</TabVehicleGear>
+
+  <!-- Vehicle gear -->
+  <Driver>Driver</Driver>
+  <Storage>Storage</Storage>
+  
+</LanguageData>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ThingDefs>
+
+  <ThingDef Name="BaseThingWithComponents" Abstract="True">
+    <thingClass>ThingWithComponents</thingClass>
+    <category>Item</category>
+    <selectable>true</selectable>
+    <tickerType>Normal</tickerType>
+    <altitudeLayer>Waist</altitudeLayer>
+		<useHitPoints>True</useHitPoints>
+    <hasTooltip>true</hasTooltip>
+    <soundImpactDefault>BulletImpactMetal</soundImpactDefault>
+  </ThingDef>
+  
+  
+  <!-- ============================ Vehicle ========================== -->
+
+  <ThingDef ParentName="BaseThingWithComponents" Name="BaseVehicle" Abstract="True">
+    <statBases>
+      <Flammability>1.0</Flammability>
+    </statBases>
+    <alwaysHaulable>false</alwaysHaulable>
+    <comps>
+      <li>
+        <compClass>CompForbiddable</compClass>
+      </li>
+      <li>
+        <compClass>ToolsForHaul.CompMountable</compClass>
+      </li>
+    </comps>
+  </ThingDef>
+
+
+  <!-- Cart -->
+  <ThingDef ParentName="BaseVehicle">
+    <defName>VehicleCart</defName>
+    <label>cart</label>
+    <hasInteractionCell>True</hasInteractionCell>
+    <interactionCellOffset>(0,0,1)</interactionCellOffset>
+    <passability>PassThroughOnly</passability>
+    <altitudeLayer>Waist</altitudeLayer>
+    <description>A cart is an old-fashioned wooden vehicle that is used for transporting goods or people.</description>
+    <thingClass>ToolsForHaul.Vehicle_Cart</thingClass>
+    <thingCategories>
+      <li>Vehicles</li>
+    </thingCategories>
+    <graphicData>
+      <texPath>Things/Pawn/Vehicle/Cart</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(2,2)</drawSize>
+    </graphicData>
+    <!-- <graphicOverdraw>true</graphicOverdraw>
+    <targetHitChanceFactor>1.0</targetHitChanceFactor> -->
+    <statBases>
+      <MaxHitPoints>200</MaxHitPoints>
+    </statBases>
+    <size>(1,1)</size>
+    <inspectorTabs>
+      <li>ToolsForHaul.Itab_Pawn_Vehicle_Storage</li>
+      <li>ToolsForHaul.ITab_Pawn_VehicleGear</li>
+    </inspectorTabs>
+    <CostList>
+      <Steel>80</Steel>
+    </CostList>
+    <leaveResourcesWhenKilled>true</leaveResourcesWhenKilled>
+    <killedLeavings>
+      <Steel>40</Steel>
+    </killedLeavings>
+    <recipeMaker>
+      <workSpeedStat>SmithingSpeed</workSpeedStat>
+      <workSkill>Crafting</workSkill>
+      <effectWorking>Smith</effectWorking>
+      <soundWorking>Recipe_Smithing</soundWorking>
+      <recipeUsers>
+        <li>TableSmithing</li>
+      </recipeUsers>
+      <workAmount>1600</workAmount>
+    <unfinishedThingDef>UnfinishedWeapon</unfinishedThingDef>
+	  <skillRequirements>
+		<!-- <li>
+		  <skill>Crafting</skill>
+		  <minLevel>8</minLevel>
+		</li> -->
+	  </skillRequirements>
+    </recipeMaker>
+  </ThingDef>
+
+  
+ <!-- Food Service Trolley -->
+ <!--  <ThingDef ParentName="BaseVehicle">
+    <defName>VehicleTrolley</defName>
+    <label>trolley</label>
+    <hasInteractionCell>True</hasInteractionCell>
+    <interactionCellOffset>(0,0,1)</interactionCellOffset>
+    <passability>PassThroughOnly</passability>
+    <altitudeLayer>Waist</altitudeLayer>
+    <description>A trolley is a small table on wheels which is used for serving drinks or food.</description>
+    <thingClass>ToolsForHaul.Vehicle_Trolley</thingClass>
+    <thingCategories>
+      <li>Vehicles</li>
+    </thingCategories>
+    <graphicPath>Things/Building/Furniture/EquipmentRack</graphicPath>
+    <graphicClass>Graphic_Single</graphicClass>
+    <graphicOverdraw>true</graphicOverdraw>
+    <targetHitChanceFactor>1.0</targetHitChanceFactor>
+    <statBases>
+      <MaxHitPoints>200</MaxHitPoints>
+    </statBases>
+    <size>(2,1)</size>
+    <building>
+      <preventDeterioration>true</preventDeterioration>
+      <fixedStorageSettings>
+        <priority>Important</priority>
+        <allowances>
+          <categories>
+            <li>FoodMeals</li>
+          </categories>
+        </allowances>
+      </fixedStorageSettings>
+    </building>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <CostList>
+      <Steel>40</Steel>
+    </CostList>
+    <recipeMaker>
+      <workSpeedStat>SmithingSpeed</workSpeedStat>
+      <workSkill>Crafting</workSkill>
+      <effectWorking>Smith</effectWorking>
+      <soundWorking>Recipe_Smithing</soundWorking>
+      <recipeUsers>
+        <li>TableSmithing</li>
+      </recipeUsers>
+      <workAmount>1600</workAmount>
+    <unfinishedThingDef>UnfinishedWeapon</unfinishedThingDef>
+	  <skillRequirements>
+	  </skillRequirements>
+    </recipeMaker>
+  </ThingDef>
+   -->
+  
+</ThingDefs>

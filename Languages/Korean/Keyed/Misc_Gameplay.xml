@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Job reports -->
+  <ReportDismountingOn>{1}에서 {0} 하차 중.</ReportDismountingOn>
+	<ReportDismounting>{0} 하차 중.</ReportDismounting>
+  <ReportMounting>{0} 승차 중.</ReportMounting>
+  <ReportPutInInventory>{1}에 {0} 넣는 중.</ReportPutInInventory>
+  <ReportPutSomethingInInventory>{1}에 넣는 중.</ReportPutSomethingInInventory>
+
+</LanguageData>

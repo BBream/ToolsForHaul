@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Mountable -->
+	<CommandDismountLabel>Dismount</CommandDismountLabel>
+	<CommandDismountDesc>Dismount vehicle that pawn is mounted</CommandDismountDesc>
+
+	<CommandMountLabel>Mount</CommandMountLabel>
+	<CommandMountDesc>Mount vehicle unmounted </CommandMountDesc>
+  
+  <!-- Backpack Gizmo -->
+  <NoItem>No item</NoItem>
+  
+</LanguageData>

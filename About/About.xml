@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>Tools for hauling</name>
+	<author>BBream</author>
+	<targetVersion>Alpha 12d</targetVersion>
+	<description>
+  https://ludeon.com/forums/index.php?topic=12282.0
+	Version V1.4
+	
+  Contents List:
+	- Cart for hauling
+  - Backpack for hauling
+		
+  Change Log
+  V1.4a
+  - Backpack gizmo's drop floating menu bug is fixed. It was made disappear equipment try to drop.
+  - Backpack is now used for hauling. Priority of using tool is Backpack - Cart - Hand.
+    Before they start hauling with backpack, they will remember backpack's item that already put in and won't drop it.
+  
+  V1.4
+  - Fixed for Alpha 12d
+  
+  V1.3a
+  - Cargo renamed 'Cart'
+  - Fixed for Alpha 11b
+  
+  V1.2a
+  - Collecting and droping logic is changed. The colonist will collect and drop it while standing if it can reach in standing position.
+  - Fixed bug that Cargo cannnot draw in while being carried by hand
+  - Chunkslag may not print holder error message. If you see this error, please report me
+  
+  V1.2
+  - Cargo is added new tab for filtering item. Cargo will be used just filtered item.
+  - Cargo can be deconstructed by float menu button. It return 40 steels.
+  - Korean language is available. Thanks Latta for translating.
+  
+  V1.1c
+  - Save-load bug that try register new pawn if game is saved while hauling with cargo.
+  
+  V1.1b
+  - Memory lick removed.
+
+  V1.1a
+  - Holder error message is not printed anymore.
+  - Fixed backpack bug that cannot use and should reequip after loading game.
+  
+  V1.1
+  - Backpack UI is improved.
+  - Cargo now check storage priority.
+  - Cargo Gizmo is removed.
+  
+  V1.0b
+  - Cargo can store item in storage building.
+  V1.0a
+  - Cargo collect not just 6 items but also 600 stacks. it can collect 600 potatos.
+  - Holder error message is fixed but still rarely printed. But it has no problem.
+  - Fixed bug that colonist do not haul job even if haulable items exist.
+    
+	</description>
+</ModMetaData>

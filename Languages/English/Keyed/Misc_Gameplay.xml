@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Job reports -->
+  <ReportDismountingOn>Dismounting {0} on {1}.</ReportDismountingOn>
+	<ReportDismounting>Dismounting {0}.</ReportDismounting>
+  <ReportMounting>Mounting {0}.</ReportMounting>
+  <ReportPutInInventory>Put {0} in {1}.</ReportPutInInventory>
+  <ReportPutSomethingInInventory>Put something in {1}.</ReportPutSomethingInInventory>
+  
+</LanguageData>

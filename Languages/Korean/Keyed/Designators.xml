@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- Backpack -->
+  <DesignatorPutInDefaultLabel>넣기</DesignatorPutInDefaultLabel>
+  <DesignatorPutInDefaultDesc>가방에 넣습니다. 용량: </DesignatorPutInDefaultDesc>
+
+  <!-- Failure messages -->
+  <CannotMount>승차할 수 있는 거주민을 선택해야 합니다.</CannotMount>
+  <NoNeedTreatment>치료가 필요한 거주민을 선택해야 합니다.</NoNeedTreatment>
+  <BackpackIsFull>베낭이 가득 찼습니다.</BackpackIsFull>
+  <InvalidPutInTarget>운반할 수 있는 물건을 선택해야 합니다.</InvalidPutInTarget>
+  <NoDoctor>거주민이 의사가 아닙니다.</NoDoctor>
+  <CannotEatAnymore>거주민이 더는 배고프지 않습니다.</CannotEatAnymore>
+
+</LanguageData>

@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<WorkGivers>
+
+  
+  <WorkGiverDef>
+    <defName>HaulWithBackpack</defName>
+    <giverClass>ToolsForHaul.WorkGiver_HaulWithBackpack</giverClass>
+    <workType>Hauling</workType>
+    <priorityInType>16</priorityInType>
+    <verb>haul with backpack</verb>
+    <gerund>hauling with backpack</gerund>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+  
+  <!-- ============= Driver ============= -->
+  
+  <WorkGiverDef>
+    <defName>HaulWithCart</defName>
+    <giverClass>ToolsForHaul.WorkGiver_HaulWithCart</giverClass>
+    <workType>Hauling</workType>
+    <priorityInType>15</priorityInType>
+    <verb>haul with tool</verb>
+    <gerund>hauling with tool</gerund>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+  
+  <WorkGiverDef>
+    <defName>DismountInBase</defName>
+    <giverClass>ToolsForHaul.WorkGiver_DismountInBase</giverClass>
+    <workType>Hauling</workType>
+    <priorityInType>3</priorityInType>
+    <verb>haul</verb>
+    <gerund>hauling</gerund>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+  
+<!-- 
+  <WorkGiverDef>
+    <defName>Store</defName>
+    <giverClass>ToolsForHaul.WorkGiver_Store</giverClass>
+    <workType>Storing</workType>
+    <verb>store</verb>
+    <gerund>storing</gerund>
+    <scanCells>false</scanCells>
+    <scanThings>true</scanThings>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef> -->
+
+
+</WorkGivers>
