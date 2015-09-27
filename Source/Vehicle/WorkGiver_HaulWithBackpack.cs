@@ -91,7 +91,7 @@ namespace ToolsForHaul
                 closestHaulable = GenClosest.ClosestThing_Global_Reachable(searchPos,
                                                                             ListerHaulables.ThingsPotentiallyNeedingHauling(),
                                                                             PathEndMode.Touch,
-                                                                            TraverseParms.For(pawn),
+                                                                            TraverseParms.For(pawn, Danger.Some),
                                                                             maxDistance,
                                                                             predicate);
                 if (closestHaulable == null) break;

@@ -145,9 +145,14 @@ public static class Toils_Collect
 
             //Thing dropThing = actor.inventory.container.First();
             Thing dropThing = null;
-            for (int i = 0; i + 1 < actor.inventory.container.Count; i++)
-                if (actor.inventory.container[i] == lastItem)
-                    dropThing = actor.inventory.container[i + 1];
+            if (lastItem != null)
+            {
+                for (int i = 0; i + 1 < actor.inventory.container.Count; i++)
+                    if (actor.inventory.container[i] == lastItem)
+                        dropThing = actor.inventory.container[i + 1];
+            }
+            else if (lastItem == null && actor.inventory.container.Count >= 1)
+                dropThing = actor.inventory.container.First();
 
             if (dropThing == null)
             {

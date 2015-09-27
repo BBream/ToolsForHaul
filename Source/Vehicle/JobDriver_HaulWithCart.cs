@@ -25,7 +25,7 @@ namespace ToolsForHaul
             hauledThing = TargetThingA;
             if (TargetThingA == null)  //Haul Cart
                 hauledThing = CurJob.targetC.Thing;
-            IntVec3 destLoc = new IntVec3(-1000, -1000, -1000);
+            IntVec3 destLoc = IntVec3.Invalid;
             string destName = null;
             SlotGroup destGroup = null;
 
@@ -101,7 +101,7 @@ namespace ToolsForHaul
                 Thing thing = GenClosest.ClosestThing_Global_Reachable(pawn.Position,
                                                                         ListerHaulables.ThingsPotentiallyNeedingHauling(),
                                                                         PathEndMode.Touch,
-                                                                        TraverseParms.For(pawn),
+                                                                        TraverseParms.For(pawn, Danger.Some),
                                                                         3,
                                                                         t => t.def.defName == CurJob.targetA.Thing.def.defName && !CurJob.targetQueueA.Contains(t));
                 if (thing != null && vehicle.storage.Count + CurJob.targetQueueA.Count < vehicle.maxItem
@@ -118,6 +118,22 @@ namespace ToolsForHaul
             {
                 vehicle.GetComp<CompMountable>().DismountAt(CurJob.GetTarget(StoreCellInd).Cell);
                 Find.Reservations.ReleaseAllClaimedBy(pawn);
+            };
+
+            Toil toilFindStoreCellIfNotHomeRegion = new Toil();
+            toilFindStoreCellIfNotHomeRegion.initAction = () =>
+            {
+                IntVec3 storeCell = IntVec3.Invalid;
+                if (!Find.AreaHome.ActiveCells.Contains(vehicle.Position) || vehicle.Position.GetZone() != null)
+                    foreach (IntVec3 cell in Find.AreaHome.ActiveCells.Where(cell => cell.GetZone() == null && cell.Standable()))
+                    {
+                        if ((vehicle.Position - cell).LengthHorizontalSquared < (vehicle.Position - storeCell).LengthHorizontalSquared)
+                            storeCell = cell;
+                    }
+                if (storeCell != IntVec3.Invalid)
+                    CurJob.targetB = storeCell;
+                else
+                    SetNextToil(toilDismount);
             };
 
             Toil toilCheckStoreCellEmpty = Toils_Jump.JumpIf(toilDismount, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
@@ -176,6 +192,10 @@ namespace ToolsForHaul
                 yield return ToolsForHaul.Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, CarrierInd);
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, extractB);
             }
+
+            yield return toilFindStoreCellIfNotHomeRegion;
+
+            yield return Toils_Goto.GotoCell(StoreCellInd, PathEndMode.OnCell);
 
             yield return toilDismount;
         }

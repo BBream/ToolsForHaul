@@ -14,6 +14,9 @@
   Change Log
   V1.4b
   - Backpack bug is fixed. After just starting game and picking up backpack, error is occured.
+  - Backpack bug is fixed. Hauling with backpack has problem when backpack is empty.
+  - Now Colonist will check temperature is safe enough(80'C below) to do hauling job. 
+  - Hauling with cart logic is changed. See https://ludeon.com/forums/index.php?topic=12282.msg175662#msg175662
   
   V1.4a
   - Backpack gizmo's drop floating menu bug is fixed. It was made disappear equipment try to drop.

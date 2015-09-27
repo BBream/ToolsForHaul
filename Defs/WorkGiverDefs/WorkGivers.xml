@@ -32,6 +32,7 @@
     <defName>DismountInBase</defName>
     <giverClass>ToolsForHaul.WorkGiver_DismountInBase</giverClass>
     <workType>Hauling</workType>
+    <!-- <emergency>true</emergency> -->
     <priorityInType>3</priorityInType>
     <verb>haul</verb>
     <gerund>hauling</gerund>

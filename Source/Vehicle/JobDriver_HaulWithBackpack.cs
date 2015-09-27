@@ -89,7 +89,7 @@ namespace ToolsForHaul
                 Thing thing = GenClosest.ClosestThing_Global_Reachable(pawn.Position,
                                                                         ListerHaulables.ThingsPotentiallyNeedingHauling(),
                                                                         PathEndMode.Touch,
-                                                                        TraverseParms.For(pawn),
+                                                                        TraverseParms.For(pawn, Danger.Some),
                                                                         3,
                                                                         t => t.def.defName == CurJob.targetA.Thing.def.defName && !CurJob.targetQueueA.Contains(t));
                 if (thing != null && pawn.inventory.container.Count + CurJob.targetQueueA.Count < backpack.maxItem

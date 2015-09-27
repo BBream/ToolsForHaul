@@ -55,10 +55,6 @@ namespace ToolsForHaul
 
         public override Job JobOnThing(Pawn pawn, Thing t)
         {
-            #if DEBUG
-            Log.Message("In " + System.Reflection.MethodBase.GetCurrentMethod() + " Memory usage: " + GC.GetTotalMemory(false));
-            #endif
-
             Vehicle_Cart carrier = t as Vehicle_Cart;
             if (carrier == null)
                 return null;
@@ -85,12 +81,7 @@ namespace ToolsForHaul
                 jobNew.targetQueueB.Add(storageCell);
             }
             if (!jobNew.targetQueueB.NullOrEmpty())
-            {
-                #if DEBUG
-                Log.Message("In End of" + System.Reflection.MethodBase.GetCurrentMethod() + " Memory usage: " + GC.GetTotalMemory(false));
-                #endif
                 return jobNew;
-            }
 
             //collectThing Predicate
             Predicate<Thing> predicate = item
@@ -109,7 +100,7 @@ namespace ToolsForHaul
                 closestHaulable = GenClosest.ClosestThing_Global_Reachable(searchPos,
                                                                             ListerHaulables.ThingsPotentiallyNeedingHauling(),
                                                                             PathEndMode.Touch,
-                                                                            TraverseParms.For(pawn),
+                                                                            TraverseParms.For(pawn, Danger.Some),
                                                                             9999,
                                                                             predicate);
                 if (closestHaulable == null) break;
@@ -125,19 +116,10 @@ namespace ToolsForHaul
 
             //Has job?
             if (!jobNew.targetQueueA.NullOrEmpty() && !jobNew.targetQueueB.NullOrEmpty())
-            {
-                #if DEBUG
-                Log.Message("In End of" + System.Reflection.MethodBase.GetCurrentMethod() + " Memory usage: " + GC.GetTotalMemory(false));
-                #endif
                 return jobNew;
-            }
 
             //No haulables or zone. Release everything
             Find.Reservations.ReleaseAllClaimedBy(pawn);
-
-            #if DEBUG
-            Log.Message("In End of" + System.Reflection.MethodBase.GetCurrentMethod() + " Memory usage: " + GC.GetTotalMemory(false));
-            #endif
             return null;
         }
 
