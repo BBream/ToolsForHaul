@@ -31,7 +31,6 @@
   </ThingDef>
 
 
-  <!-- Cart -->
   <ThingDef ParentName="BaseVehicle">
     <defName>VehicleCart</defName>
     <label>cart</label>
@@ -49,8 +48,6 @@
       <graphicClass>Graphic_Multi</graphicClass>
       <drawSize>(2,2)</drawSize>
     </graphicData>
-    <!-- <graphicOverdraw>true</graphicOverdraw>
-    <targetHitChanceFactor>1.0</targetHitChanceFactor> -->
     <statBases>
       <MaxHitPoints>200</MaxHitPoints>
     </statBases>
@@ -75,7 +72,7 @@
         <li>TableSmithing</li>
       </recipeUsers>
       <workAmount>1600</workAmount>
-    <unfinishedThingDef>UnfinishedWeapon</unfinishedThingDef>
+    <unfinishedThingDef>UnfinishedCart</unfinishedThingDef>
 	  <skillRequirements>
 		<!-- <li>
 		  <skill>Crafting</skill>
@@ -85,6 +82,57 @@
     </recipeMaker>
   </ThingDef>
 
+  
+
+  <ThingDef ParentName="BaseVehicle">
+    <defName>VehicleSaddle</defName>
+    <label>saddle</label>
+    <hasInteractionCell>True</hasInteractionCell>
+    <interactionCellOffset>(0,0,0)</interactionCellOffset>
+    <passability>PassThroughOnly</passability>
+    <altitudeLayer>Waist</altitudeLayer>
+    <description>A saddle is a leather seat that you put on the back of an animal so that you can ride the animal.</description>
+    <thingClass>ToolsForHaul.Vehicle_Saddle</thingClass>
+    <thingCategories>
+      <li>Vehicles</li>
+    </thingCategories>
+    <graphicData>
+      <texPath>Things/Pawn/Vehicle/Saddle</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(2,2)</drawSize>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>200</MaxHitPoints>
+    </statBases>
+    <size>(1,1)</size>
+    <inspectorTabs>
+      <li>ToolsForHaul.ITab_Pawn_VehicleGear</li>
+    </inspectorTabs>
+    <CostList>
+      <Steel>40</Steel>
+    </CostList>
+    <leaveResourcesWhenKilled>true</leaveResourcesWhenKilled>
+    <killedLeavings>
+      <Steel>20</Steel>
+    </killedLeavings>
+    <recipeMaker>
+      <workSpeedStat>SmithingSpeed</workSpeedStat>
+      <workSkill>Crafting</workSkill>
+      <effectWorking>Smith</effectWorking>
+      <soundWorking>Recipe_Smithing</soundWorking>
+      <recipeUsers>
+        <li>TableSmithing</li>
+      </recipeUsers>
+      <workAmount>1600</workAmount>
+    <unfinishedThingDef>UnfinishedWeapon</unfinishedThingDef>
+	  <skillRequirements>
+		<!-- <li>
+		  <skill>Crafting</skill>
+		  <minLevel>8</minLevel>
+		</li> -->
+	  </skillRequirements>
+    </recipeMaker>
+  </ThingDef>
   
  <!-- Food Service Trolley -->
  <!--  <ThingDef ParentName="BaseVehicle">

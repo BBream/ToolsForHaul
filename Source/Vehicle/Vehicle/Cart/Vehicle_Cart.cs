@@ -117,9 +117,6 @@ namespace ToolsForHaul
             foreach (FloatMenuOption fmo in base.GetFloatMenuOptions(myPawn))
                 yield return fmo;
 
-            foreach (var compFMO in mountableComp.CompGetFloatMenuOptionsForExtra(myPawn))
-                yield return compFMO;
-
             action_Order = () =>
             {
                 Find.Reservations.ReleaseAllForTarget(this);

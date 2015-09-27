@@ -23,7 +23,7 @@ namespace ToolsForHaul
 
         public void MountOn(Pawn pawn) { driver = pawn; }
         public bool IsMounted { get { return (driver != null) ? true : false; } }
-        public Pawn Driver { get { return driver; } set { driver = value; } }
+        public Pawn Driver { get { return driver; } }
         public void Dismount() 
         { 
             //if (Find.Reservations.IsReserved(parent, driver.Faction))
@@ -93,7 +93,7 @@ namespace ToolsForHaul
             {
                 Designator_Mount designator = new Designator_Mount();
 
-                designator.cart = parent;
+                designator.vehicle = parent;
                 designator.defaultLabel = txtCommandMountLabel.Translate();
                 designator.defaultDesc = txtCommandMountDesc.Translate();
                 designator.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconMount");

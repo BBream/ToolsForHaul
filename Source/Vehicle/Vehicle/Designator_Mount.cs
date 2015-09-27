@@ -15,7 +15,7 @@ namespace ToolsForHaul
     {
         private const string txtCannotMount = "CannotMount";
 
-        public Thing cart;
+        public Thing vehicle;
 
         public Designator_Mount(): base()
         {
@@ -32,7 +32,7 @@ namespace ToolsForHaul
             foreach (var thing in thingList)
             {
                 Pawn pawn = thing as Pawn;
-                if (pawn != null && (pawn.Faction == Faction.OfColony || (pawn.RaceProps.Animal && pawn.drafter != null)))
+                if (pawn != null && (pawn.Faction == Faction.OfColony || (pawn.Faction == Faction.OfColony && pawn.RaceProps.Animal)))
                     return true;
             }
             return new AcceptanceReport(txtCannotMount.Translate());
@@ -44,13 +44,13 @@ namespace ToolsForHaul
             foreach (var thing in thingList)
             {
                 Pawn pawn = thing as Pawn;
-                if (pawn != null && (pawn.Faction == Faction.OfColony || (pawn.RaceProps.Animal && pawn.drafter != null)))
+                if (pawn != null && (pawn.Faction == Faction.OfColony || (pawn.Faction == Faction.OfColony && pawn.RaceProps.Animal)))
                 {
                     Pawn driver = pawn;
                     Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("Mount"));
-                    Find.Reservations.ReleaseAllForTarget(cart);
-                    jobNew.targetA = cart;
-                    driver.drafter.TakeOrderedJob(jobNew);
+                    Find.Reservations.ReleaseAllForTarget(vehicle);
+                    jobNew.targetA = vehicle;
+                    driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);
                     break;
                 }
             }
