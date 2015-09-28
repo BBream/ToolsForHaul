@@ -24,6 +24,12 @@
   </JobDef>
 
   <JobDef>
+    <defName>HaulWithAnimalCart</defName>
+    <driverClass>ToolsForHaul.JobDriver_HaulWithAnimalCart</driverClass>
+    <reportString>Collecting TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
     <defName>HaulWithCart</defName>
     <driverClass>ToolsForHaul.JobDriver_HaulWithCart</driverClass>
     <reportString>Collecting TargetA.</reportString>
@@ -39,6 +45,24 @@
     <defName>Mount</defName>
     <driverClass>ToolsForHaul.JobDriver_Mount</driverClass>
     <reportString>Mount on TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>MakeMount</defName>
+    <driverClass>ToolsForHaul.JobDriver_MakeMount</driverClass>
+    <reportString>Mount on TargetB.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>Board</defName>
+    <driverClass>ToolsForHaul.JobDriver_Board</driverClass>
+    <reportString>Board on TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>GotoAndWait</defName>
+    <driverClass>ToolsForHaul.JobDriver_GotoAndWait</driverClass>
+    <reportString>Go and wait on TargetA.</reportString>
   </JobDef>
   
 <!-- 

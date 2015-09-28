@@ -37,7 +37,6 @@ namespace ToolsForHaul
             float fieldHeight = 30.0f;
 
             Vehicle_Cart cart = this.SelThing as Vehicle_Cart;
-            cart.ExposeData();
 
             ConceptDatabase.KnowledgeDemonstrated(ConceptDefOf.PrisonerTab, KnowledgeAmount.GuiFrame);
             Text.Font = GameFont.Small;

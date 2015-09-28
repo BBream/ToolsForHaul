@@ -55,6 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Backpack\Apparel_Backpack.cs" />
+    <Compile Include="Vehicle\Cart\JobDriver_GotoAndWait.cs" />
+    <Compile Include="Vehicle\Cart\JobDriver_HaulWithAnimalCart.cs" />
+    <Compile Include="Vehicle\Cart\WorkGiver_HaulWithAnimalCart.cs" />
     <Compile Include="Vehicle\CompMountable.cs" />
     <Compile Include="Backpack\Designator_ApplyMedicine.cs" />
     <Compile Include="Backpack\Designator_InstallForBackpack.cs" />
@@ -69,13 +72,17 @@
     <Compile Include="Vehicle\Cart\JobDriver_HaulWithCart.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Vehicle\JobDriver_Board.cs" />
     <Compile Include="Vehicle\JobDriver_DismountInBase.cs" />
     <Compile Include="Backpack\JobDriver_HaulWithBackpack.cs" />
+    <Compile Include="Vehicle\JobDriver_MakeMount.cs" />
     <Compile Include="Vehicle\JobDriver_Mount.cs" />
     <Compile Include="Backpack\JobDriver_PutInInventory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Toils_Collect.cs" />
     <Compile Include="Vehicle\Cart\Vehicle_Cart.cs" />
+    <Compile Include="Vehicle\Saddle\Designator_Board.cs" />
+    <Compile Include="Vehicle\Saddle\Designator_Move.cs" />
     <Compile Include="Vehicle\Saddle\Vehicle_Saddle.cs" />
     <Compile Include="Vehicle\WorkGiver_DismountInBase.cs" />
     <Compile Include="Backpack\WorkGiver_HaulWithBackpack.cs" />

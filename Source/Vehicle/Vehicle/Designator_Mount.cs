@@ -23,19 +23,22 @@ namespace ToolsForHaul
             this.soundSucceeded = SoundDefOf.Click;
         }
 
-        public override int DraggableDimensions { get { return 1; } }
+        public override int DraggableDimensions { get { return 2; } }
 
         public override AcceptanceReport CanDesignateCell(IntVec3 loc)
         {
-            List<Thing> thingList = loc.GetThingList();
-
-            foreach (var thing in thingList)
-            {
-                Pawn pawn = thing as Pawn;
-                if (pawn != null && (pawn.Faction == Faction.OfColony || (pawn.Faction == Faction.OfColony && pawn.RaceProps.Animal)))
-                    return true;
-            }
-            return new AcceptanceReport(txtCannotMount.Translate());
+            Pawn pawn = loc.GetThingList().Find(t => t is Pawn) as Pawn;
+            if (pawn == null)
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "It is not pawn.");
+            if (pawn.Faction != Faction.OfColony)
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "It is not in your faction.");
+            if (!pawn.RaceProps.Animal && vehicle is Vehicle_Saddle)
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "It is not for humanlike or mechanoid.");
+            if (pawn.RaceProps.Animal && !pawn.training.IsCompleted(TrainableDefOf.Obedience))
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "The animal is not trained for 'Obedience'.");
+            if (pawn.RaceProps.Animal && !(pawn.RaceProps.baseBodySize >= 1.0))
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "The animal is too small to mount.");
+            return true;
         }
 
         public override void DesignateSingleCell(IntVec3 c)
@@ -44,13 +47,30 @@ namespace ToolsForHaul
             foreach (var thing in thingList)
             {
                 Pawn pawn = thing as Pawn;
-                if (pawn != null && (pawn.Faction == Faction.OfColony || (pawn.Faction == Faction.OfColony && pawn.RaceProps.Animal)))
+                if (pawn != null && (pawn.Faction == Faction.OfColony && (pawn.RaceProps.mechanoid || pawn.RaceProps.Humanlike)))
                 {
-                    Pawn driver = pawn;
                     Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("Mount"));
                     Find.Reservations.ReleaseAllForTarget(vehicle);
                     jobNew.targetA = vehicle;
-                    driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);
+                    pawn.jobs.StartJob(jobNew, JobCondition.InterruptForced);
+                    break;
+                }
+                else if (pawn != null && (pawn.Faction == Faction.OfColony && pawn.RaceProps.Animal && pawn.training.IsCompleted(TrainableDefOf.Obedience) && pawn.RaceProps.baseBodySize >= 1.0))
+                {
+                    Pawn worker = null;
+                    Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("MakeMount"));
+                    Find.Reservations.ReleaseAllForTarget(vehicle);
+                    jobNew.targetA = vehicle;
+                    jobNew.targetB = pawn;
+                    foreach (Pawn colonyPawn in Find.ListerPawns.FreeColonistsSpawned)
+                        if (worker == null || (worker.Position - pawn.Position).LengthHorizontal > (colonyPawn.Position - pawn.Position).LengthHorizontal)
+                            worker = colonyPawn;
+                    if (worker == null)
+                    {
+                        Messages.Message("No worker make animal mount.", MessageSound.RejectInput);
+                        break;
+                    }
+                    worker.jobs.StartJob(jobNew, JobCondition.InterruptForced);
                     break;
                 }
             }

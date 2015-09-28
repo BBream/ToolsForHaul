@@ -38,8 +38,8 @@ namespace ToolsForHaul
         //slotGroupParent Interface
         public ThingFilter allowances;
 
-        public int maxItem = 6;
-        public int GetMaxStackCount { get { return maxItem * 100; } }
+        public int MaxItem { get { return (mountableComp.IsMounted && mountableComp.Driver.RaceProps.Animal)? 6 : 3; } }
+        public int GetMaxStackCount { get { return MaxItem * 100; } }
 
         int tickTime = 0;
 
@@ -160,8 +160,7 @@ namespace ToolsForHaul
         public override void Tick()
         {
             base.Tick();
-            tickTime += 1;
-            //mountableComp.CompTick();
+            tickTime += 1;    
         }
 
         #endregion

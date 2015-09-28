@@ -10,13 +10,13 @@ using Verse.AI;
 
 namespace ToolsForHaul
 {
-    public class WorkGiver_HaulWithCart : WorkGiver_Scanner
+    public class WorkGiver_HaulWithAnimalCart : WorkGiver_Scanner
     {
         private static List<Thing> availableVehicle;
         private static IntVec3 invalidCell = new IntVec3(0, 0, 0);
 
 
-        public WorkGiver_HaulWithCart() : base() {}
+        public WorkGiver_HaulWithAnimalCart() : base() {}
         /*
         public virtual PathEndMode PathEndMode { get; }
         public virtual ThingRequest PotentialWorkThingRequest { get; }
@@ -34,8 +34,9 @@ namespace ToolsForHaul
         {
             availableVehicle = Find.ListerThings.AllThings.FindAll((Thing aV)
             => ((aV is Vehicle_Cart) && !aV.IsForbidden(pawn.Faction) && pawn.CanReserveAndReach(aV, PathEndMode.Touch, Danger.Some)
-            && (!aV.TryGetComp<CompMountable>().IsMounted || aV.TryGetComp<CompMountable>().Driver == pawn 
-            || aV.TryGetComp<CompMountable>().Driver.RaceProps.Animal)                 
+            && (aV.TryGetComp<CompMountable>().IsMounted && aV.TryGetComp<CompMountable>().Driver.RaceProps.Animal 
+                && aV.TryGetComp<CompMountable>().Driver.needs.food.CurCategory != HungerCategory.Hungry
+                && aV.TryGetComp<CompMountable>().Driver.needs.rest.CurCategory != RestCategory.Tired)//Driver is animal not hungry and restless
             ));
 
             #if DEBUG
@@ -61,9 +62,7 @@ namespace ToolsForHaul
 
             IEnumerable<Thing> remainingItems = carrier.storage;
             int reservedMaxItem = carrier.storage.Count;
-            Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("HaulWithCart"));
-            if (carrier.mountableComp.IsMounted && carrier.mountableComp.Driver.RaceProps.Animal)
-                jobNew = new Job(DefDatabase<JobDef>.GetNamed("HaulWithAnimalCart"));
+            Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("HaulWithAnimalCart"));
             //jobNew.maxNumToCarry = 99999;
             //jobNew.haulMode = HaulMode.ToCellStorage;
             jobNew.targetQueueA = new List<TargetInfo>();

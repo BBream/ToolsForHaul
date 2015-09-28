@@ -71,7 +71,7 @@
       <recipeUsers>
         <li>TableSmithing</li>
       </recipeUsers>
-      <workAmount>1600</workAmount>
+      <workAmount>2400</workAmount>
     <unfinishedThingDef>UnfinishedCart</unfinishedThingDef>
 	  <skillRequirements>
 		<!-- <li>
@@ -102,12 +102,12 @@
       <drawSize>(2,2)</drawSize>
     </graphicData>
     <statBases>
-      <MaxHitPoints>200</MaxHitPoints>
+      <MaxHitPoints>100</MaxHitPoints>
     </statBases>
     <size>(1,1)</size>
-    <inspectorTabs>
+<!--     <inspectorTabs>
       <li>ToolsForHaul.ITab_Pawn_VehicleGear</li>
-    </inspectorTabs>
+    </inspectorTabs> -->
     <CostList>
       <Steel>40</Steel>
     </CostList>

@@ -21,7 +21,7 @@ namespace ToolsForHaul
 
         protected Pawn driver = null;
 
-        public void MountOn(Pawn pawn) { driver = pawn; }
+        public void MountOn(Pawn pawn) { if (driver != null)return; driver = pawn; }
         public bool IsMounted { get { return (driver != null) ? true : false; } }
         public Pawn Driver { get { return driver; } }
         public void Dismount() 
