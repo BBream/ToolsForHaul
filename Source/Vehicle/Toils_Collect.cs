@@ -36,13 +36,19 @@ public static class Toils_Collect
                 //Transfer in container
                 foreach (Thing apparel in wornApparel)
                 {
-                    actor.inventory.container.TryAdd(apparel);
-                    apparel.holder = actor.inventory.GetContainer();
+                    if (actor.inventory.container.TryAdd(apparel))
+                    {
+                        apparel.holder = actor.inventory.GetContainer();
+                        apparel.holder.owner = actor.inventory;
+                    }
                 }
             }
             //Collecting TargetIndex ind
-            actor.inventory.container.TryAdd(haulThing);
-            haulThing.holder = actor.inventory.GetContainer();
+            if (actor.inventory.container.TryAdd(haulThing))
+            {
+                haulThing.holder = actor.inventory.GetContainer();
+                haulThing.holder.owner = actor.inventory;
+            }
 
         };
         toil.FailOn(() =>
@@ -82,21 +88,30 @@ public static class Toils_Collect
                 //Transfer in container
                 foreach (Thing apparel in wornApparel)
                 {
-                    carrier.storage.TryAdd(apparel);
-                    apparel.holder = carrier.GetContainer();
+                    if (carrier.storage.TryAdd(apparel))
+                    {
+                        apparel.holder = carrier.GetContainer();
+                        apparel.holder.owner = carrier;
+                    }
                 }
             }
             //Collecting TargetIndex ind
-            carrier.storage.TryAdd(haulThing);
-            haulThing.holder = carrier.GetContainer();
+            if (carrier.storage.TryAdd(haulThing))
+            {
+                haulThing.holder = carrier.GetContainer();
+                haulThing.holder.owner = carrier;
+            }
 
             List<TargetInfo> thingList = curJob.GetTargetQueue(HaulableInd);
             for (int i = 0; i < thingList.Count; i++)
                 if (actor.Position.AdjacentTo8Way(thingList[i].Thing.Position))
                 {
                     Find.DesignationManager.RemoveAllDesignationsOn(thingList[i].Thing);
-                    carrier.storage.TryAdd(thingList[i].Thing);
-                    thingList[i].Thing.holder = carrier.GetContainer();
+                    if (carrier.storage.TryAdd(thingList[i].Thing))
+                    {
+                        thingList[i].Thing.holder = carrier.GetContainer();
+                        thingList[i].Thing.holder.owner = carrier;
+                    }
                     thingList.RemoveAt(i);
                     i--;
                 }
@@ -136,7 +151,7 @@ public static class Toils_Collect
 
             Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
             actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
-            dropThing.holder = null;
+            //dropThing.holder = null;
 
             return;
         };
@@ -174,7 +189,7 @@ public static class Toils_Collect
 
             Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
             actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
-            dropThing.holder = null;
+            //dropThing.holder = null;
 
             return;
         };
@@ -197,7 +212,7 @@ public static class Toils_Collect
 
             Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
             carrier.storage.TryDrop(dropThing, destLoc, placeMode, out dummy);
-            dropThing.holder = null;
+            //dropThing.holder = null;
 
             //List<Thing> dropThings = carrier.storage.ToList();
             List<TargetInfo> cellList = curJob.GetTargetQueue(StoreCellInd);
@@ -214,7 +229,7 @@ public static class Toils_Collect
                 {
                     Find.DesignationManager.RemoveAllDesignationsOn(carrier.storage[i]);
                     carrier.storage.TryDrop(carrier.storage[i], cellList[i].Cell, ThingPlaceMode.Direct, out dummy);
-                    dropThing.holder = null;
+                    //dropThing.holder = null;
                     cellList.RemoveAt(i);
                     //dropThings.RemoveAt(dropThings.IndexOf(dropThings[i]));
                     i--;
@@ -234,9 +249,6 @@ public static class Toils_Collect
             Pawn actor = toil.actor;
             Job curJob = actor.jobs.curJob;
             IntVec3 destLoc = actor.jobs.curJob.GetTarget(StoreCellInd).Cell;
-
-            foreach (Thing thing in actor.inventory.container)
-                thing.holder = null;
 
             actor.inventory.container.TryDropAll(destLoc, placeMode);
             return;

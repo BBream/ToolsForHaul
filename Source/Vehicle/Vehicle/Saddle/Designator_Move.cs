@@ -36,8 +36,8 @@ namespace ToolsForHaul
 
         public override void DesignateSingleCell(IntVec3 c)
         {
-            Job jobNew = new Job(JobDefOf.Goto, c);
-            driver.jobs.StartJob(jobNew);
+            Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), c, 4800);
+            driver.jobs.StartJob(jobNew, JobCondition.Incompletable);
 
             DesignatorManager.Deselect();
         }

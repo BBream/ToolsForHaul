@@ -34,14 +34,11 @@ namespace ToolsForHaul
         {
             availableVehicle = Find.ListerThings.AllThings.FindAll((Thing aV)
             => ((aV is Vehicle_Cart) && !aV.IsForbidden(pawn.Faction) && pawn.CanReserveAndReach(aV, PathEndMode.Touch, Danger.Some)
-            && (!aV.TryGetComp<CompMountable>().IsMounted || aV.TryGetComp<CompMountable>().Driver == pawn 
-            || aV.TryGetComp<CompMountable>().Driver.RaceProps.Animal)                 
+            && ((!aV.TryGetComp<CompMountable>().IsMounted || aV.TryGetComp<CompMountable>().Driver == pawn)        //HaulWithCart
+            || (aV.TryGetComp<CompMountable>().IsMounted && aV.TryGetComp<CompMountable>().Driver.RaceProps.Animal  //HaulWithAnimalCart
+                && aV.TryGetComp<CompMountable>().Driver.needs.food.CurCategory != HungerCategory.Hungry
+                && aV.TryGetComp<CompMountable>().Driver.needs.rest.CurCategory != RestCategory.Tired))//Driver is animal not hungry and restless
             ));
-
-            #if DEBUG
-            //Log.Message("Number of Reservation:" + Find.Reservations.AllReservedThings().Count().ToString());
-            //Log.Message("availableVehicle Count: " + availableVehicle.Count);
-            #endif
             return availableVehicle as IEnumerable<Thing>;
         }
 

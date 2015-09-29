@@ -55,7 +55,7 @@ namespace ToolsForHaul
                 Pawn driver = cart.mountableComp.Driver;
                 Widgets.ThingIcon(thingIconRect, driver);
                 Widgets.Label(thingLabelRect, driver.Label);
-                if(Widgets.InvisibleButton(thingButtonRect))
+                if(Event.current.button == 1 && Widgets.InvisibleButton(thingButtonRect))
                 {
                     List<FloatMenuOption> options = new List<FloatMenuOption>();
                     FloatMenuOption dismount = new FloatMenuOption(txtDismount.Translate(driver.LabelBase), () =>
@@ -88,7 +88,7 @@ namespace ToolsForHaul
                 else
                     Widgets.ThingIcon(thingIconRect, thing);
                 Widgets.Label(thingLabelRect, thing.Label.Translate());
-                if (Widgets.InvisibleButton(thingButtonRect))
+                if (Event.current.button == 1 && Widgets.InvisibleButton(thingButtonRect))
                 {
                     List<FloatMenuOption> options = new List<FloatMenuOption>();
                     options.Add(new FloatMenuOption(Translator.Translate("ThingInfo"), () =>
@@ -106,6 +106,9 @@ namespace ToolsForHaul
                 thingIconRect.y += fieldHeight;
                 thingLabelRect.y += fieldHeight;
             }
+            if (Widgets.TextButton(new Rect(180f, 400f, 100f, 30f), "Drop All"))
+                cart.storage.TryDropAll(cart.Position, ThingPlaceMode.Near);
+
             GUI.EndGroup();
         }
 	}

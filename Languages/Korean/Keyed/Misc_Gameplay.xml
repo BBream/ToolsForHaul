@@ -7,5 +7,14 @@
   <ReportMounting>{0} 승차 중.</ReportMounting>
   <ReportPutInInventory>{1}에 {0} 넣는 중.</ReportPutInInventory>
   <ReportPutSomethingInInventory>{1}에 넣는 중.</ReportPutSomethingInInventory>
-
+  <ReportBoarding>Boarding {0}.</ReportBoarding>
+  <ReportStandby>Standing by on {0}</ReportStandby> 
+  
+  <!-- Cart -->
+  <InStorage>In Storage: </InStorage>
+  
+  <!-- Saddle -->
+  <Rider>Rider: </Rider>
+  
+  
 </LanguageData>

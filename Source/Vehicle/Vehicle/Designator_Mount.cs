@@ -29,15 +29,15 @@ namespace ToolsForHaul
         {
             Pawn pawn = loc.GetThingList().Find(t => t is Pawn) as Pawn;
             if (pawn == null)
-                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "It is not pawn.");
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "NotPawn".Translate());
             if (pawn.Faction != Faction.OfColony)
-                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "It is not in your faction.");
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "NotColonyFaction".Translate());
             if (!pawn.RaceProps.Animal && vehicle is Vehicle_Saddle)
-                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "It is not for humanlike or mechanoid.");
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "NotHumanlikeOrMechanoid".Translate());
             if (pawn.RaceProps.Animal && !pawn.training.IsCompleted(TrainableDefOf.Obedience))
-                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "The animal is not trained for 'Obedience'.");
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "NotTrainedAnimal".Translate());
             if (pawn.RaceProps.Animal && !(pawn.RaceProps.baseBodySize >= 1.0))
-                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "The animal is too small to mount.");
+                return new AcceptanceReport(txtCannotMount.Translate() + ": " + "TooSmallAnimal".Translate());
             return true;
         }
 
@@ -60,6 +60,7 @@ namespace ToolsForHaul
                     Pawn worker = null;
                     Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("MakeMount"));
                     Find.Reservations.ReleaseAllForTarget(vehicle);
+                    jobNew.maxNumToCarry = 1;
                     jobNew.targetA = vehicle;
                     jobNew.targetB = pawn;
                     foreach (Pawn colonyPawn in Find.ListerPawns.FreeColonistsSpawned)
@@ -67,10 +68,11 @@ namespace ToolsForHaul
                             worker = colonyPawn;
                     if (worker == null)
                     {
-                        Messages.Message("No worker make animal mount.", MessageSound.RejectInput);
+                        Messages.Message("NoWorkForMakeMount".Translate(), MessageSound.RejectInput);
                         break;
                     }
                     worker.jobs.StartJob(jobNew, JobCondition.InterruptForced);
+                    pawn.jobs.StartJob(new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), pawn.Position, 2400 + (int)((worker.Position - pawn.Position).LengthHorizontal * 120)));
                     break;
                 }
             }

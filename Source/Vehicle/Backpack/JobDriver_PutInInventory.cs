@@ -92,7 +92,11 @@ namespace ToolsForHaul
                     {
                         if (CurJob.targetB.Thing.TryGetComp<CompForbiddable>() != null && CurJob.targetB.Thing.TryGetComp<CompForbiddable>().Forbidden == true)
                             CurJob.targetB.Thing.TryGetComp<CompForbiddable>().Forbidden = false;
-                        pawn.inventory.container.TryAdd(CurJob.targetB.Thing, CurJob.maxNumToCarry);
+                        if (pawn.inventory.container.TryAdd(CurJob.targetB.Thing, CurJob.maxNumToCarry))
+                        {
+                            CurJob.targetB.Thing.holder = pawn.inventory.GetContainer();
+                            CurJob.targetB.Thing.holder.owner = pawn.inventory;
+                        }
                     }
                     else
                         this.EndJobWith(JobCondition.Incompletable);

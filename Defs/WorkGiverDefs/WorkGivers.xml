@@ -16,7 +16,7 @@
   
   <!-- ============= Driver ============= -->
  
-  <WorkGiverDef>
+<!--   <WorkGiverDef>
     <defName>HaulWithAnimalCart</defName>
     <giverClass>ToolsForHaul.WorkGiver_HaulWithAnimalCart</giverClass>
     <workType>Hauling</workType>
@@ -26,7 +26,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
-  </WorkGiverDef>
+  </WorkGiverDef> -->
  
   <WorkGiverDef>
     <defName>HaulWithCart</defName>
@@ -40,6 +40,18 @@
     </requiredCapacities>
   </WorkGiverDef>
   
+ <!--  <WorkGiverDef>
+    <defName>HaulWithTools</defName>
+    <giverClass>ToolsForHaul.WorkGiver_HaulWithTools</giverClass>
+    <workType>Hauling</workType>
+    <priorityInType>15</priorityInType>
+    <verb>haul with tools</verb>
+    <gerund>hauling with tools</gerund>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef> -->
+  
   <WorkGiverDef>
     <defName>DismountInBase</defName>
     <giverClass>ToolsForHaul.WorkGiver_DismountInBase</giverClass>
@@ -52,20 +64,6 @@
       <li>Manipulation</li>
     </requiredCapacities>
   </WorkGiverDef>
-  
-<!-- 
-  <WorkGiverDef>
-    <defName>Store</defName>
-    <giverClass>ToolsForHaul.WorkGiver_Store</giverClass>
-    <workType>Storing</workType>
-    <verb>store</verb>
-    <gerund>storing</gerund>
-    <scanCells>false</scanCells>
-    <scanThings>true</scanThings>
-    <requiredCapacities>
-      <li>Manipulation</li>
-    </requiredCapacities>
-  </WorkGiverDef> -->
 
 
 </WorkGivers>

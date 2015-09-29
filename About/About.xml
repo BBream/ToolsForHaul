@@ -5,13 +5,24 @@
 	<targetVersion>Alpha 12d</targetVersion>
 	<description>
   https://ludeon.com/forums/index.php?topic=12282.0
-	Version V1.4
+	Version V1.5
 	
   Contents List:
 	- Cart for hauling
   - Backpack for hauling
+  - Saddle for rider
 		
   Change Log
+  V1.5
+  - Cart can be mounted in animal's back. For this, Animal should be trained for 'Obeidence' and bigger than human.(baseBodySize >= 1.0)
+  This is list of animal can mount cart: 
+    Warg, Husky, LabradorRetriever, Elk, Thrumbo, Boomalope, Muffalo, Rhinoceros, Dromedary, Elephant, Cow, Alpaca.
+  - Cart has been nerfed. Maximum items humanlike can haul with cart is changed from 6 items or 600 stacks to 3 items or 300 stacks. 
+  Instead, Maximum items animal can haul with cart is 6 items or 600 stacks.
+  - Saddle is added. Saddle can be mounted in animal's back. Human can board on Animal has saddle like riding horse. 
+  Rider would attack if enemy is close enough.
+  - 'Drop All' button is added in Cart's Gear inspector tab.
+  
   V1.4b
   - Backpack bug is fixed. After just starting game and picking up backpack, error is occured.
   - Backpack bug is fixed. Hauling with backpack has problem when backpack is empty.

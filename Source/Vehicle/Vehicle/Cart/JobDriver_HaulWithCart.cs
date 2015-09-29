@@ -133,7 +133,7 @@ namespace ToolsForHaul
                 if (storeCell != IntVec3.Invalid)
                     CurJob.targetB = storeCell;
                 else
-                    SetNextToil(toilDismount);
+                    CurJob.targetB = vehicle.Position;
             };
 
             Toil toilCheckStoreCellEmpty = Toils_Jump.JumpIf(toilDismount, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());

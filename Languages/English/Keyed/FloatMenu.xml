@@ -9,4 +9,8 @@
   <!-- Vehicle -->
   <Deconstruct>Deconstruct {0}</Deconstruct>
   
+  <!-- Saddle -->
+  <Ride>Ride {0}</Ride>
+  <AlreadyRide>Already ride.</AlreadyRide>
+  
 </LanguageData>

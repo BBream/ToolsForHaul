@@ -3,10 +3,16 @@
 
   <!-- Mountable -->
 	<CommandDismountLabel>Dismount</CommandDismountLabel>
-	<CommandDismountDesc>Dismount vehicle that pawn is mounted</CommandDismountDesc>
-
+	<CommandDismountDesc>Dismount vehicle that pawn is mounted.</CommandDismountDesc>
 	<CommandMountLabel>Mount</CommandMountLabel>
-	<CommandMountDesc>Mount vehicle unmounted </CommandMountDesc>
+	<CommandMountDesc>Mount vehicle unmounted.</CommandMountDesc>
+  
+  <CommandRideLabel>Ride</CommandRideLabel>
+  <CommandRideDesc>Ride animal.</CommandRideDesc>
+  <CommandGetOffLabel>Get off</CommandGetOffLabel>
+  <CommandGetOffDesc>Get off rider.</CommandGetOffDesc>
+  <CommandMoveLabel>Move</CommandMoveLabel>
+  <CommandMoveDesc>Move to designated cell.</CommandMoveDesc>
   
   <!-- Backpack Gizmo -->
   <NoItem>No item</NoItem>

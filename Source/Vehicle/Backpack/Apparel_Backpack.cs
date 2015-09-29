@@ -30,16 +30,12 @@ namespace ToolsForHaul
 
         public int maxItem;
         public Pawn postWearer;
-        Gizmo_BackpackEquipment gizmo;
-        Designator_PutInInventory designator;
 
         public int maxStack { get { return maxItem * 1; } }
 
         public Apparel_Backpack() : base()
         {
             postWearer = null;
-            gizmo = new Gizmo_BackpackEquipment();
-            designator = new Designator_PutInInventory();
         }
 
         public override void SpawnSetup()
@@ -78,8 +74,7 @@ namespace ToolsForHaul
 
         public override IEnumerable<Gizmo> GetWornGizmos()
         {
-            if (designator == null)
-                designator = new Designator_PutInInventory();
+            Designator_PutInInventory designator = new Designator_PutInInventory();
 
             designator.backpack = this;
             designator.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconPutIn");
@@ -90,8 +85,7 @@ namespace ToolsForHaul
 
             yield return designator;
 
-            if (gizmo == null)
-                gizmo = new Gizmo_BackpackEquipment();
+            Gizmo_BackpackEquipment gizmo = new Gizmo_BackpackEquipment();
 
             gizmo.backpack = this;
             yield return gizmo;

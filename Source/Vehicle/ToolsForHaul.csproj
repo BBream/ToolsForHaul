@@ -87,6 +87,7 @@
     <Compile Include="Vehicle\WorkGiver_DismountInBase.cs" />
     <Compile Include="Backpack\WorkGiver_HaulWithBackpack.cs" />
     <Compile Include="Vehicle\Cart\WorkGiver_HaulWithCart.cs" />
+    <Compile Include="WorkGiver_HaulWithTools.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

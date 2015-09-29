@@ -80,31 +80,11 @@ namespace ToolsForHaul
             Scribe_Deep.LookDeep<ThingFilter>(ref allowances, "allowances");
         }
 
-        /*public override IEnumerable<Gizmo> GetGizmos()
+        public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var baseGizmo in base.GetGizmos())
                 yield return baseGizmo;
-
-            Command_Action com = new Command_Action();
-            if (ignoreForbidden)
-            {
-                com.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconIgnoreForbidden");
-                com.defaultLabel = "Ignore Fobidden";
-                com.defaultDesc = "Ignore Fobidden";
-            }
-            else
-            {
-                com.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconConsiderForbidden");
-                com.defaultLabel = "Consider Fobidden";
-                com.defaultDesc = "Consider Fobidden";
-            }
-            com.hotKey = KeyBindingDef.Named("CommandToggleIgnoreForbidden");
-            //com.groupKey = vehicleGroupKey;
-            com.activateSound = SoundDef.Named("Click");
-            com.action = () => { ignoreForbidden = ignoreForbidden ^ true; };// Toggle
-
-            yield return com;
-        }*/
+        }
 
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn myPawn)
         {
@@ -243,6 +223,16 @@ namespace ToolsForHaul
             }
         }
 
+        public override string GetInspectString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append(base.GetInspectString());
+            stringBuilder.AppendLine("InStorage".Translate());
+            foreach (Thing thing in this.storage)
+                stringBuilder.Append(thing.LabelCap.Translate() + ", ");
+            stringBuilder.Remove(stringBuilder.Length - 3, 1);
+            return stringBuilder.ToString();
+        }
         #endregion
     }
 }

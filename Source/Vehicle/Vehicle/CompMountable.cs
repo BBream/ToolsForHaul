@@ -21,7 +21,12 @@ namespace ToolsForHaul
 
         protected Pawn driver = null;
 
-        public void MountOn(Pawn pawn) { if (driver != null)return; driver = pawn; }
+        public void MountOn(Pawn pawn) 
+        { 
+            if (driver != null)
+                return; 
+            driver = pawn;
+        }
         public bool IsMounted { get { return (driver != null) ? true : false; } }
         public Pawn Driver { get { return driver; } }
         public void Dismount() 
@@ -34,7 +39,10 @@ namespace ToolsForHaul
         {
             Dismount();
             //if (driver.Position.IsAdjacentTo8WayOrInside(dismountPos, driver.Rotation, new IntVec2(1,1)))
-            parent.Position = dismountPos;
+            if (dismountPos != IntVec3.Invalid)
+                parent.Position = dismountPos;
+            else
+                Log.Warning("Tried dismount at " + dismountPos);
         }
         public Vector3 InteractionOffset { get { return parent.def.interactionCellOffset.ToVector3().RotatedBy(driver.Rotation.AsAngle); } }
         public Vector3 Position { 

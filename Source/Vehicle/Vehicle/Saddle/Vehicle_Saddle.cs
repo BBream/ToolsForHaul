@@ -28,10 +28,13 @@ namespace ToolsForHaul
         public ThingContainer GetContainer() { return storage; }
         public IntVec3 GetPosition() { return this.Position; }
 
+        public int MaxItem { get { return (Rider != null) ? 3 : 2; } }
+        public Pawn Rider { get {return (this.storage.Where(x => x is Pawn).Count() > 0)? this.storage.Where(x => x is Pawn).First() as Pawn : null; }}
         public virtual void BoardOn(Pawn pawn)
         {
-            if (this.storage.Count(x => x is Pawn) >= maxNumBoarding //No Space
-                || (this.Faction != null && this.Faction != pawn.Faction))                        //Not your vehicle
+            if (mountableComp.IsMounted 
+                && (this.storage.Count(x => x is Pawn) >= maxNumBoarding                                //No Space
+                || (this.Faction != null && this.Faction != pawn.Faction)))                        //Not your vehicle
                 return;
 
             if (pawn.Faction == Faction.OfColony && (pawn.needs.food.CurCategory == HungerCategory.Starving || pawn.needs.rest.CurCategory == RestCategory.Exhausted))
@@ -39,9 +42,12 @@ namespace ToolsForHaul
                 Messages.Message(pawn.LabelCap + "cannot board on " + this.LabelCap + ": " + pawn.LabelCap + "is starving or exhausted", MessageSound.RejectInput);
                 return;
             }
+            Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), mountableComp.Driver.Position, 4800);
+            mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.Incompletable);
 
             this.storage.TryAdd(pawn);
             pawn.holder = this.GetContainer();
+            pawn.holder.owner = this;
             pawn.jobs.StartJob(new Job(JobDefOf.WaitCombat));
         }
         public virtual void Unboard(Pawn pawn)
@@ -63,7 +69,7 @@ namespace ToolsForHaul
                 return;
 
             Thing dummy;
-            foreach (Pawn crew in this.storage.Where(x => x is Pawn))
+            foreach (Pawn crew in this.storage.Where(x => x is Pawn).ToList())
             {
                 crew.holder = null;
                 crew.jobs.StopAll();
@@ -104,8 +110,8 @@ namespace ToolsForHaul
                 Designator_Board designatorBoard = new Designator_Board();
 
                 designatorBoard.vehicle = this;
-                designatorBoard.defaultLabel = "Ride";
-                designatorBoard.defaultDesc = "Ride";
+                designatorBoard.defaultLabel = "CommandRideLabel".Translate();
+                designatorBoard.defaultDesc = "CommandRideDesc".Translate();
                 designatorBoard.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconBoard");
                 designatorBoard.activateSound = SoundDef.Named("Click");
 
@@ -115,8 +121,8 @@ namespace ToolsForHaul
             {
                 Command_Action commandUnboardAll = new Command_Action();
 
-                commandUnboardAll.defaultLabel = "Get off";
-                commandUnboardAll.defaultDesc = "Get off";
+                commandUnboardAll.defaultLabel = "CommandGetOffLabel".Translate();
+                commandUnboardAll.defaultDesc = "CommandGetOffDesc".Translate();
                 commandUnboardAll.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconUnboardAll");
                 commandUnboardAll.activateSound = SoundDef.Named("Click");
                 commandUnboardAll.action = () => { this.UnboardAll(); };
@@ -126,8 +132,8 @@ namespace ToolsForHaul
                 Designator_Move designator = new Designator_Move();
 
                 designator.driver = this.mountableComp.Driver;
-                designator.defaultLabel = "Move";
-                designator.defaultDesc = "Move animal";
+                designator.defaultLabel = "CommandMoveLabel".Translate();
+                designator.defaultDesc = "CommandMoveDesc".Translate();
                 designator.icon = ContentFinder<Texture2D>.Get("UI/Commands/ReleaseAnimals");
                 designator.activateSound = SoundDef.Named("Click");
                 designator.hotKey = KeyBindingDefOf.Misc1;
@@ -140,6 +146,26 @@ namespace ToolsForHaul
         {
             foreach (FloatMenuOption fmo in base.GetFloatMenuOptions(myPawn))
                 yield return fmo;
+
+            if (mountableComp.IsMounted)
+            {
+                FloatMenuOption fmoBoard = new FloatMenuOption();
+
+                fmoBoard.label = "Ride".Translate(mountableComp.Driver.LabelBase);
+                fmoBoard.priority = MenuOptionPriority.High;
+                fmoBoard.action = () =>
+                {
+                    Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("Board"), this);
+                    myPawn.drafter.TakeOrderedJob(jobNew);
+                };
+                if (this.storage.Count(x => x is Pawn) >= 1)
+                {
+                    fmoBoard.label = "AlreadyRide".Translate();
+                    fmoBoard.Disabled = true;
+                }
+
+                yield return fmoBoard;
+            }
         }
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
@@ -217,7 +243,7 @@ namespace ToolsForHaul
                 Vector3 crewsOffset = new Vector3(0.25f, 0.02f, -0.25f);
                 if (this.Rotation == Rot4.North || this.Rotation == Rot4.South)
                     crewsOffset.x = 0f;
-                foreach (Pawn pawn in this.storage.Where(x => x is Pawn))
+                foreach (Pawn pawn in this.storage.Where(x => x is Pawn).ToList())
                 {
                     pawn.Rotation = this.Rotation;
                     pawn.DrawAt(crewLoc + crewsOffset.RotatedBy(this.Rotation.AsAngle));
@@ -238,6 +264,17 @@ namespace ToolsForHaul
             }
             else
                 base.DrawAt(drawLoc);
+        }
+
+        public override string GetInspectString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append(base.GetInspectString());
+            stringBuilder.AppendLine("Rider".Translate());
+            foreach (Pawn pawn in this.storage.Where(x => x is Pawn).ToList())
+                stringBuilder.Append(pawn.LabelCap.Translate() + ", ");
+            stringBuilder.Remove(stringBuilder.Length - 3, 1);
+            return stringBuilder.ToString();
         }
         #endregion
     }

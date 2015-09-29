@@ -7,6 +7,13 @@
 
   <!-- Failure messages -->
   <CannotMount>승차할 수 있는 거주민을 선택해야 합니다.</CannotMount>
+    <NotPawn>It is not pawn.</NotPawn>
+    <NotColonyFaction>It is not in your faction.</NotColonyFaction>
+    <NotHumanlikeOrMechanoid>It is not for humanlike or mechanoid.</NotHumanlikeOrMechanoid>
+    <NotTrainedAnimal>The animal is not trained for 'Obedience'.</NotTrainedAnimal>
+    <TooSmallAnimal>The animal is too small to mount.</TooSmallAnimal>
+    <NoWorkForMakeMount>No worker make animal mount.</NoWorkForMakeMount>
+  <CannotBoard>Must designate humanlike or colony mechanoid.</CannotBoard>
   <NoNeedTreatment>치료가 필요한 거주민을 선택해야 합니다.</NoNeedTreatment>
   <BackpackIsFull>베낭이 가득 찼습니다.</BackpackIsFull>
   <InvalidPutInTarget>운반할 수 있는 물건을 선택해야 합니다.</InvalidPutInTarget>

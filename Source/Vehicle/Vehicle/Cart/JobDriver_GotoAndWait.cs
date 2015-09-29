@@ -20,7 +20,7 @@ namespace ToolsForHaul
         public override string GetReport()
         {
             string repString;
-            repString = "ReportGoto".Translate(TargetA.Cell);
+            repString = "ReportStandby".Translate(TargetA.Cell);
 
             return repString;
         }
@@ -31,8 +31,8 @@ namespace ToolsForHaul
             //Set fail conditions
             ///
 
-            this.FailOnBurningImmobile(DestInd);
             this.FailOn(() => TargetA.Cell == IntVec3.Invalid);
+            this.FailOnBurningImmobile(DestInd);
 
             ///
             //Define Toil
