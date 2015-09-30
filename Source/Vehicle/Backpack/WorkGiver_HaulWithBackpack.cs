@@ -11,33 +11,18 @@ using Verse.AI;
 
 namespace ToolsForHaul
 {
-    public class WorkGiver_HaulWithBackpack : WorkGiver_Scanner
+    public class WorkGiver_HaulWithBackpack : WorkGiver
     {
         private static IntVec3 invalidCell = new IntVec3(0, 0, 0);
 
 
         public WorkGiver_HaulWithBackpack() : base() { }
-        /*
-        public virtual PathEndMode PathEndMode { get; }
-        public virtual ThingRequest PotentialWorkThingRequest { get; }
 
-        public virtual bool HasJobOnCell(Pawn pawn, IntVec3 c);
-        public virtual bool HasJobOnThing(Pawn pawn, Thing t);
-        public virtual Job JobOnCell(Pawn pawn, IntVec3 cell);
-        public virtual Job JobOnThing(Pawn pawn, Thing t);
-        public PawnActivityDef MissingRequiredActivity(Pawn pawn);
-        public virtual IEnumerable<IntVec3> PotentialWorkCellsGlobal(Pawn pawn);
-        public virtual IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn Pawn);
-        public virtual bool ShouldSkip(Pawn pawn);
-         */
-        public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
+        /*public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {            
-            /*foreach (Apparel apparel in pawn.apparel.WornApparel)
-                if (apparel is Apparel_Backpack)
-                    yield return apparel;*/
             //Need dummy for just running this workGiver
             return ListerHaulables.ThingsPotentiallyNeedingHauling();
-        }
+        }*/
 
         public override bool ShouldSkip(Pawn pawn)
         {
@@ -52,7 +37,7 @@ namespace ToolsForHaul
             return true;
         }
 
-        public override Job JobOnThing(Pawn pawn, Thing t)
+        public override Job NonScanJob(Pawn pawn)
         {
             Apparel_Backpack backpack = null;
             foreach (Apparel apparel in pawn.apparel.WornApparel)

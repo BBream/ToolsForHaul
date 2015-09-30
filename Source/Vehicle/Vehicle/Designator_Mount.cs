@@ -64,7 +64,7 @@ namespace ToolsForHaul
                     jobNew.targetA = vehicle;
                     jobNew.targetB = pawn;
                     foreach (Pawn colonyPawn in Find.ListerPawns.FreeColonistsSpawned)
-                        if (worker == null || (worker.Position - pawn.Position).LengthHorizontal > (colonyPawn.Position - pawn.Position).LengthHorizontal)
+                        if (colonyPawn.CurJob.def != jobNew.def && (worker == null || (worker.Position - pawn.Position).LengthHorizontal > (colonyPawn.Position - pawn.Position).LengthHorizontal))
                             worker = colonyPawn;
                     if (worker == null)
                     {
@@ -72,7 +72,6 @@ namespace ToolsForHaul
                         break;
                     }
                     worker.jobs.StartJob(jobNew, JobCondition.InterruptForced);
-                    pawn.jobs.StartJob(new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), pawn.Position, 2400 + (int)((worker.Position - pawn.Position).LengthHorizontal * 120)));
                     break;
                 }
             }

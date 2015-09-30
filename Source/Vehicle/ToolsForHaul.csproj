@@ -55,9 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Backpack\Apparel_Backpack.cs" />
-    <Compile Include="Vehicle\Cart\JobDriver_GotoAndWait.cs" />
+    <Compile Include="Vehicle\Cart\JobDriver_Standby.cs" />
     <Compile Include="Vehicle\Cart\JobDriver_HaulWithAnimalCart.cs" />
-    <Compile Include="Vehicle\Cart\WorkGiver_HaulWithAnimalCart.cs" />
     <Compile Include="Vehicle\CompMountable.cs" />
     <Compile Include="Backpack\Designator_ApplyMedicine.cs" />
     <Compile Include="Backpack\Designator_InstallForBackpack.cs" />

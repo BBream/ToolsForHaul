@@ -11,60 +11,76 @@ namespace ToolsForHaul
 {
     public class WorkGiver_DismountInBase : WorkGiver_Scanner
     {
-        private List<Thing> availableVehicle;
         private static IntVec3 invalidCell = new IntVec3(0, 0, 0);
+        private static List<Thing> vehicleInt;
+        private static int vehicleIntNum;
 
         public WorkGiver_DismountInBase() : base() { }
-        /*
-        public virtual PathEndMode PathEndMode { get; }
-        public virtual ThingRequest PotentialWorkThingRequest { get; }
 
-        public virtual bool HasJobOnCell(Pawn pawn, IntVec3 c);
-        public virtual bool HasJobOnThing(Pawn pawn, Thing t);
-        public virtual Job JobOnCell(Pawn pawn, IntVec3 cell);
-        public virtual Job JobOnThing(Pawn pawn, Thing t);
-        public PawnActivityDef MissingRequiredActivity(Pawn pawn);
-        public virtual IEnumerable<IntVec3> PotentialWorkCellsGlobal(Pawn pawn);
-        public virtual IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn Pawn);
-        public virtual bool ShouldSkip(Pawn pawn);
-         */
+        private List<Thing> Cart()
+        {
+            int currentVehicleNum = Find.ListerThings.AllThings.Count((Thing vehicle) => (vehicle is Vehicle_Cart));
+            if (vehicleInt == null || (vehicleInt != null && vehicleIntNum != currentVehicleNum))
+            {
+                vehicleIntNum = currentVehicleNum;
+                vehicleInt = Find.ListerThings.AllThings.FindAll((Thing vehicle) => (vehicle is Vehicle_Cart));
+            }
+            return vehicleInt;
+        }
+        private static bool AvailableCart(Thing thing, Pawn pawn)
+        {
+            Vehicle_Cart vehicle = thing as Vehicle_Cart;
+            if (vehicle == null)
+                return false;
+            return ((vehicle.TryGetComp<CompMountable>().IsMounted && vehicle.TryGetComp<CompMountable>().Driver == pawn)
+                            || !vehicle.TryGetComp<CompMountable>().IsMounted);
+        }
+        private static bool AvailableAnimalCart(Thing thing)
+        {
+            Vehicle_Cart vehicle = thing as Vehicle_Cart;
+            if (vehicle == null)
+                return false;
+            return vehicle.TryGetComp<CompMountable>().IsMounted && vehicle.TryGetComp<CompMountable>().Driver.RaceProps.Animal
+                            && vehicle.TryGetComp<CompMountable>().Driver.needs.food.CurCategory < HungerCategory.Starving
+                            && vehicle.TryGetComp<CompMountable>().Driver.needs.rest.CurCategory < RestCategory.VeryTired
+                            && vehicle.TryGetComp<CompMountable>().Driver.health.State == PawnHealthState.Mobile
+                            && vehicle.TryGetComp<CompMountable>().Driver.health.ShouldBeTreatedNow == false;
+        }
+
+        public override bool HasJobOnThing(Pawn pawn, Thing t)
+        {
+            //Check that pawn already has reserved cart. 
+            if (Cart().Any(vehicle => Find.Reservations.FirstReserverOf(vehicle, Faction.OfColony) == pawn && vehicle == t))
+                return false;
+            return (!t.IsForbidden(pawn.Faction) 
+                && (pawn.CanReserveAndReach(t, PathEndMode.Touch, Danger.Some))
+                && (AvailableCart(t, pawn) || AvailableAnimalCart(t)));
+        }
+
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
-            availableVehicle = Find.ListerThings.AllThings.FindAll((Thing aV)
-            => ((aV is Vehicle_Cart) && !aV.IsForbidden(pawn.Faction) && !aV.IsInValidBestStorage()
-            && ((!aV.TryGetComp<CompMountable>().IsMounted && pawn.CanReserve(aV))   //Unmounted
-                || aV.TryGetComp<CompMountable>().Driver == pawn)                  //or Driver is pawnself
-            ));
-
-            #if DEBUG
-            Log.Message("Number of Reservation:" + Find.Reservations.AllReservedThings().Count().ToString());
-            //Log.Message("availableVehicle Count: " + availableVehicle.Count);
-            #endif
-            return availableVehicle as IEnumerable<Thing>;
+            return Cart() as IEnumerable<Thing>;
         }
 
         public override bool ShouldSkip(Pawn pawn)
         {
-            return Find.ListerThings.AllThings.Find((Thing aV)
-            => ((aV is Vehicle_Cart) && !aV.IsForbidden(pawn.Faction) && !aV.IsInValidBestStorage()
-            && ((!aV.TryGetComp<CompMountable>().IsMounted && pawn.CanReserve(aV))   //Unmounted
-                || aV.TryGetComp<CompMountable>().Driver == pawn)                  //or Driver is pawnself
-            )) == null;
+            return (ListerHaulables.ThingsPotentiallyNeedingHauling().Count <= 0                           //No Haulable
+                    && !Cart().Any(vehicle => pawn.CanReserveAndReach(vehicle, PathEndMode.Touch, Danger.Some) && ((Vehicle_Cart)vehicle).storage.Count > 0)); //No cart need to drop                  
         }
 
         public override Job JobOnThing(Pawn pawn, Thing t)
         {
             if (!(t is Vehicle_Cart))
                 return null;
-            Vehicle_Cart carrier = t as Vehicle_Cart;
+            Vehicle_Cart cart = t as Vehicle_Cart;
             Job jobDismountInBase = new Job(DefDatabase<JobDef>.GetNamed("DismountInBase"));
 
             //Set carrier
-            jobDismountInBase.targetA = carrier;
-            ReservationUtility.Reserve(pawn, carrier);
+            jobDismountInBase.targetA = cart;
+            ReservationUtility.Reserve(pawn, cart);
 
             //Move cart in Base
-            jobDismountInBase.targetB = FindStorageCell(pawn, carrier);
+            jobDismountInBase.targetB = FindStorageCell(pawn, cart);
 
             return jobDismountInBase.targetB != IntVec3.Invalid ? jobDismountInBase : null;
         }

@@ -46,17 +46,12 @@ namespace ToolsForHaul
             //Define Toil
             ///
 
-
-
-
-            ///
-            //Toils Start
-            ///
-
-            //Reserve thing to be stored and storage cell 
-            yield return Toils_Reserve.Reserve(MountableInd);
-
-            yield return Toils_Reserve.Reserve(DriverInd);
+            Toil toilMakeStandby = new Toil();
+            toilMakeStandby.initAction = () =>
+            {
+                Pawn driver = CurJob.GetTarget(DriverInd).Thing as Pawn;
+                driver.jobs.StartJob(new Job(DefDatabase<JobDef>.GetNamed("Standby"), driver.Position, 2400 + (int)((pawn.Position - driver.Position).LengthHorizontal * 120)), JobCondition.InterruptForced);
+            };
 
             Toil toilGoto = null;
             toilGoto = Toils_Goto.GotoThing(MountableInd, PathEndMode.ClosestTouch)
@@ -79,11 +74,6 @@ namespace ToolsForHaul
 
                     return false;
                 });
-            yield return toilGoto;
-
-            yield return Toils_Haul.StartCarryThing(MountableInd);
-
-            yield return Toils_Haul.CarryHauledThingToCell(DriverInd);
 
             Toil toilMountOn = new Toil();
             toilMountOn.initAction = () =>
@@ -95,7 +85,39 @@ namespace ToolsForHaul
                     Log.Error(GetActor().LabelCap + ": Try make mount without target B");
             };
 
+            Toil toilEnd = new Toil();
+            toilEnd.initAction = () =>
+            {
+                Vehicle_Cart cart = CurJob.GetTarget(MountableInd).Thing as Vehicle_Cart;
+                if (cart == null)
+                {
+                    Log.Error(GetActor().LabelCap + ": MakeMount get TargetA not cart.");
+                    return;
+                }
+                if (cart.mountableComp.IsMounted && cart.mountableComp.Driver.CurJob.def == DefDatabase<JobDef>.GetNamed("Standby"))
+                    cart.mountableComp.Driver.jobs.curDriver.EndJobWith(JobCondition.Succeeded);
+            };
+
+            ///
+            //Toils Start
+            ///
+
+            //Reserve thing to be stored and storage cell 
+            yield return Toils_Reserve.Reserve(MountableInd);
+
+            yield return Toils_Reserve.Reserve(DriverInd);
+
+            yield return toilMakeStandby;
+
+            yield return toilGoto;
+
+            yield return Toils_Haul.StartCarryThing(MountableInd);
+
+            yield return Toils_Haul.CarryHauledThingToCell(DriverInd);
+
             yield return toilMountOn;
+
+            yield return toilEnd;
         }
 
     }

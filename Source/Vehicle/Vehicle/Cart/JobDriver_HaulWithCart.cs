@@ -49,7 +49,7 @@ namespace ToolsForHaul
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            Vehicle_Cart vehicle = CurJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
+            Vehicle_Cart cart = CurJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
 
             ///
             //Set fail conditions
@@ -69,10 +69,11 @@ namespace ToolsForHaul
             Toil toilMountOn = new Toil();
             toilMountOn.initAction = () =>
             {
-                vehicle.GetComp<CompMountable>().MountOn(pawn);
+                cart.GetComp<CompMountable>().MountOn(pawn);
 
-                //If unmounted, this job is failed
-                this.FailOn(() => { return (vehicle.GetComp<CompMountable>().Driver != toilMountOn.actor) ? true : false; });
+                //If Driver is not same with worker, this job is failed
+                if (cart.GetComp<CompMountable>().Driver != toilMountOn.actor)
+                    EndJobWith(JobCondition.Incompletable);
             };
 
             Toil extractA = new Toil();
@@ -104,8 +105,8 @@ namespace ToolsForHaul
                                                                         TraverseParms.For(pawn, Danger.Some),
                                                                         3,
                                                                         t => t.def.defName == CurJob.targetA.Thing.def.defName && !CurJob.targetQueueA.Contains(t));
-                if (thing != null && vehicle.storage.Count + CurJob.targetQueueA.Count < vehicle.MaxItem
-                    && vehicle.storage.TotalStackCount + CurJob.targetQueueA.Sum(t => t.Thing.stackCount) < vehicle.GetMaxStackCount && Find.Reservations.CanReserve(pawn, thing))
+                if (thing != null && cart.storage.Count + CurJob.targetQueueA.Count < cart.MaxItem
+                    && cart.storage.TotalStackCount + CurJob.targetQueueA.Sum(t => t.Thing.stackCount) < cart.GetMaxStackCount && Find.Reservations.CanReserve(pawn, thing))
                 {
                     CurJob.targetQueueA.Add(thing);
                     Find.Reservations.Reserve(pawn, thing);
@@ -116,7 +117,7 @@ namespace ToolsForHaul
             Toil toilDismount = new Toil();
             toilDismount.initAction = () => 
             {
-                vehicle.GetComp<CompMountable>().DismountAt(CurJob.GetTarget(StoreCellInd).Cell);
+                cart.GetComp<CompMountable>().DismountAt(CurJob.GetTarget(StoreCellInd).Cell);
                 Find.Reservations.ReleaseAllClaimedBy(pawn);
             };
 
@@ -124,16 +125,16 @@ namespace ToolsForHaul
             toilFindStoreCellIfNotHomeRegion.initAction = () =>
             {
                 IntVec3 storeCell = IntVec3.Invalid;
-                if (!Find.AreaHome.ActiveCells.Contains(vehicle.Position) || vehicle.Position.GetZone() != null)
+                if (!Find.AreaHome.ActiveCells.Contains(cart.Position) || cart.Position.GetZone() != null)
                     foreach (IntVec3 cell in Find.AreaHome.ActiveCells.Where(cell => cell.GetZone() == null && cell.Standable()))
                     {
-                        if ((vehicle.Position - cell).LengthHorizontalSquared < (vehicle.Position - storeCell).LengthHorizontalSquared)
+                        if ((cart.Position - cell).LengthHorizontalSquared < (cart.Position - storeCell).LengthHorizontalSquared)
                             storeCell = cell;
                     }
                 if (storeCell != IntVec3.Invalid)
                     CurJob.targetB = storeCell;
                 else
-                    CurJob.targetB = vehicle.Position;
+                    CurJob.targetB = cart.Position;
             };
 
             Toil toilCheckStoreCellEmpty = Toils_Jump.JumpIf(toilDismount, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
@@ -150,7 +151,7 @@ namespace ToolsForHaul
 
             
             //JumpIf already mounted
-            yield return Toils_Jump.JumpIf(toilCheckHaulableEmpty, () => { return (vehicle.GetComp<CompMountable>().Driver == pawn)? true: false;});
+            yield return Toils_Jump.JumpIf(toilCheckHaulableEmpty, () => { return (cart.GetComp<CompMountable>().Driver == pawn)? true: false;});
             
             //Mount on Target
             yield return Toils_Goto.GotoThing(CarrierInd, PathEndMode.ClosestTouch)
@@ -168,9 +169,7 @@ namespace ToolsForHaul
 
                 yield return Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
                                               .FailOnDestroyed(HaulableInd);
-                //yield return toilGoToThing;
 
-                //CollectIntoCarrier
                 yield return ToolsForHaul.Toils_Collect.CollectInCarrier(CarrierInd, HaulableInd);
  
                 yield return toilCheckDuplicates;
@@ -183,13 +182,13 @@ namespace ToolsForHaul
 
             //Drop TargetQueue
             {
-                //Extract an haulable into TargetA
+                //Extract an haulable into TargetB
                 yield return extractB;
 
                 yield return Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch);
 
-                //CollectIntoCarrier
                 yield return ToolsForHaul.Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, CarrierInd);
+
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, extractB);
             }
 

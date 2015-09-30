@@ -12,66 +12,86 @@ namespace ToolsForHaul
 {
     public class WorkGiver_HaulWithCart : WorkGiver_Scanner
     {
-        private static List<Thing> availableVehicle;
         private static IntVec3 invalidCell = new IntVec3(0, 0, 0);
+        private static List<Thing> vehicleInt;
+        private static int vehicleIntNum;
 
+        public WorkGiver_HaulWithCart() : base() { }
 
-        public WorkGiver_HaulWithCart() : base() {}
-        /*
-        public virtual PathEndMode PathEndMode { get; }
-        public virtual ThingRequest PotentialWorkThingRequest { get; }
+        private List<Thing> Cart()
+        {
+            int currentVehicleNum = Find.ListerThings.AllThings.Count((Thing thing) => (thing is Vehicle_Cart));
+            if (vehicleInt == null || (vehicleInt != null && vehicleIntNum != currentVehicleNum))
+            {
+                vehicleIntNum = currentVehicleNum;
+                vehicleInt = Find.ListerThings.AllThings.FindAll((Thing thing) => (thing is Vehicle_Cart));
+            }
+            return vehicleInt;
+        }
+        private static bool AvailableCart(Thing thing, Pawn pawn)
+        {
+            Vehicle_Cart vehicle = thing as Vehicle_Cart;
+            if (vehicle == null)
+                return false;
+            //Not mounted or Driver is pawnself
+            return (!vehicle.TryGetComp<CompMountable>().IsMounted || vehicle.TryGetComp<CompMountable>().Driver == pawn);
+        }
+        private static bool AvailableAnimalCart(Thing thing)
+        {
+            Vehicle_Cart vehicle = thing as Vehicle_Cart;
+            if (vehicle == null)
+                return false;
+            return vehicle.TryGetComp<CompMountable>().IsMounted && vehicle.TryGetComp<CompMountable>().Driver.RaceProps.Animal
+                            && vehicle.TryGetComp<CompMountable>().Driver.needs.food.CurCategory < HungerCategory.Starving
+                            && vehicle.TryGetComp<CompMountable>().Driver.needs.rest.CurCategory < RestCategory.VeryTired
+                            && vehicle.TryGetComp<CompMountable>().Driver.health.State == PawnHealthState.Mobile
+                            && vehicle.TryGetComp<CompMountable>().Driver.health.ShouldBeTreatedNow == false;
+        }
 
-        public virtual bool HasJobOnCell(Pawn pawn, IntVec3 c);
-        public virtual bool HasJobOnThing(Pawn pawn, Thing t);
-        public virtual Job JobOnCell(Pawn pawn, IntVec3 cell);
-        public virtual Job JobOnThing(Pawn pawn, Thing t);
-        public PawnActivityDef MissingRequiredActivity(Pawn pawn);
-        public virtual IEnumerable<IntVec3> PotentialWorkCellsGlobal(Pawn pawn);
-        public virtual IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn Pawn);
-        public virtual bool ShouldSkip(Pawn pawn);
-         */
+        public override bool HasJobOnThing(Pawn pawn, Thing t)
+        {
+            //Check that pawn already has reserved cart. 
+            Thing reservedThing = Cart().Find(vehicle => Find.Reservations.FirstReserverOf(vehicle, Faction.OfColony) == pawn);
+            if (reservedThing != null)
+                return (reservedThing == t)? true : false;
+
+            //Check Cart is valid for using.
+            return (!t.IsForbidden(pawn.Faction) 
+                && pawn.CanReserveAndReach(t, PathEndMode.Touch, Danger.Some)
+                && (AvailableCart(t, pawn) || AvailableAnimalCart(t)));
+        }
+
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
-            availableVehicle = Find.ListerThings.AllThings.FindAll((Thing aV)
-            => ((aV is Vehicle_Cart) && !aV.IsForbidden(pawn.Faction) && pawn.CanReserveAndReach(aV, PathEndMode.Touch, Danger.Some)
-            && ((!aV.TryGetComp<CompMountable>().IsMounted || aV.TryGetComp<CompMountable>().Driver == pawn)        //HaulWithCart
-            || (aV.TryGetComp<CompMountable>().IsMounted && aV.TryGetComp<CompMountable>().Driver.RaceProps.Animal  //HaulWithAnimalCart
-                && aV.TryGetComp<CompMountable>().Driver.needs.food.CurCategory != HungerCategory.Hungry
-                && aV.TryGetComp<CompMountable>().Driver.needs.rest.CurCategory != RestCategory.Tired))//Driver is animal not hungry and restless
-            ));
-            return availableVehicle as IEnumerable<Thing>;
+            return Cart() as IEnumerable<Thing>;
         }
 
         public override bool ShouldSkip(Pawn pawn)
         {
-            availableVehicle = PotentialWorkThingsGlobal(pawn) as List<Thing>;
-
-            return (availableVehicle.Find(aV => ((Vehicle_Cart)aV).storage.TotalStackCount > 0) == null //Need to drop
-                    && ListerHaulables.ThingsPotentiallyNeedingHauling().Count == 0);        //No Haulable
+            //DebugWriteHaulingPawn(pawn);
+            return (Cart().Count == 0                                                                          //No Cart
+                    || (ListerHaulables.ThingsPotentiallyNeedingHauling().Count == 0                           //Or No Haulable
+                    && !Cart().Any(cart => pawn.CanReserve(cart) && ((Vehicle_Cart)cart).storage.Count > 0))); //   No cart need to drop                  
         }
 
         public override Job JobOnThing(Pawn pawn, Thing t)
         {
-            Vehicle_Cart carrier = t as Vehicle_Cart;
-            if (carrier == null)
+            Vehicle_Cart cart = t as Vehicle_Cart;
+            if (cart == null)
                 return null;
 
-            IEnumerable<Thing> remainingItems = carrier.storage;
-            int reservedMaxItem = carrier.storage.Count;
+            IEnumerable<Thing> remainingItems = cart.storage;
+            int reservedMaxItem = cart.storage.Count;
             Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("HaulWithCart"));
-            if (carrier.mountableComp.IsMounted && carrier.mountableComp.Driver.RaceProps.Animal)
+            if (cart.mountableComp.IsMounted && cart.mountableComp.Driver.RaceProps.Animal)
                 jobNew = new Job(DefDatabase<JobDef>.GetNamed("HaulWithAnimalCart"));
-            //jobNew.maxNumToCarry = 99999;
-            //jobNew.haulMode = HaulMode.ToCellStorage;
             jobNew.targetQueueA = new List<TargetInfo>();
             jobNew.targetQueueB = new List<TargetInfo>();
-
-            //Set carrier
-            jobNew.targetC = carrier;
-            ReservationUtility.Reserve(pawn, carrier);
+            jobNew.targetC = cart;
+            ReservationUtility.Reserve(pawn, cart);
 
             //Drop remaining item
-            foreach (var remainingItem in remainingItems)
+            foreach (Thing remainingItem in remainingItems)
             {
                 IntVec3 storageCell = FindStorageCell(pawn, remainingItem, jobNew.targetQueueB);
                 if (!storageCell.IsValid) break;
@@ -87,20 +107,23 @@ namespace ToolsForHaul
                 => !jobNew.targetQueueA.Contains(item) && pawn.CanReserve(item) && !item.IsInValidBestStorage();
 
             //Collect and drop item
-            while (reservedMaxItem < carrier.MaxItem)
+            while (reservedMaxItem < cart.MaxItem)
             {
                 IntVec3 storageCell = IntVec3.Invalid;
                 Thing closestHaulable = null;
 
                 IntVec3 searchPos;
-                searchPos = (!jobNew.targetQueueA.NullOrEmpty() && jobNew.targetQueueA.First() != IntVec3.Invalid) ?
-                    jobNew.targetQueueA.First().Thing.Position : searchPos = carrier.Position;
+                searchPos = (!jobNew.targetQueueA.NullOrEmpty() && jobNew.targetQueueA.First().Thing.Position != IntVec3.Invalid) ?
+                    jobNew.targetQueueA.First().Thing.Position : cart.Position;
+                int maxDistance;
+                maxDistance = (!jobNew.targetQueueA.NullOrEmpty() && jobNew.targetQueueA.First().Thing.Position != IntVec3.Invalid) ?
+                    30 : 9999;
 
                 closestHaulable = GenClosest.ClosestThing_Global_Reachable(searchPos,
                                                                             ListerHaulables.ThingsPotentiallyNeedingHauling(),
                                                                             PathEndMode.Touch,
                                                                             TraverseParms.For(pawn, Danger.Some),
-                                                                            9999,
+                                                                            maxDistance,
                                                                             predicate);
                 if (closestHaulable == null) break;
 
@@ -119,12 +142,13 @@ namespace ToolsForHaul
 
             //No haulables or zone. Release everything
             Find.Reservations.ReleaseAllClaimedBy(pawn);
-            return null;
+            return (Job)null;
         }
 
 
         private IntVec3 FindStorageCell(Pawn pawn, Thing closestHaulable, List<TargetInfo> targetQueue)
         {
+            //Find closest cell in queue.
             if (!targetQueue.NullOrEmpty())
                 foreach (TargetInfo target in targetQueue)
                     foreach (var adjCell in GenAdjFast.AdjacentCells8Way(target))
@@ -140,6 +164,36 @@ namespace ToolsForHaul
             }
 
             return IntVec3.Invalid;
+        }
+
+        private void DebugWriteHaulingPawn(Pawn pawn)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(pawn.LabelCap + " Report: Vehicle " + Cart().Count + " - ");
+            foreach (Pawn other in Find.ListerPawns.FreeColonistsSpawned)
+            {
+                if (other.CurJob != null && other.CurJob.def == JobDefOf.HaulToCell)
+                    stringBuilder.AppendLine(other.LabelCap + " Job: " + other.CurJob.def.defName);
+            }
+            foreach (Vehicle_Cart vehicle in Cart())
+            {
+                string driver = ((vehicle.mountableComp.IsMounted) ? vehicle.mountableComp.Driver.LabelCap : "No Driver");
+                string state = "";
+                if (vehicle.IsForbidden(pawn.Faction))
+                    state = string.Concat(state, "Forbidden ");
+                if (pawn.CanReserveAndReach(vehicle, PathEndMode.Touch, Danger.Some))
+                    state = string.Concat(state, "CanReserveAndReach ");
+                if (AvailableCart(vehicle, pawn))
+                    state = string.Concat(state, "AvailableCart ");
+                if (AvailableAnimalCart(vehicle))
+                    state = string.Concat(state, "AvailableAnimalCart ");
+                Pawn reserver = Find.Reservations.FirstReserverOf(vehicle, Faction.OfColony);
+                if (reserver != null)
+                    state = string.Concat(state, reserver.LabelCap, " Job: ", reserver.CurJob.def.defName);
+                stringBuilder.AppendLine(vehicle.LabelCap + "- " + driver + ": " + state);
+
+            }
+            Log.Message(stringBuilder.ToString());
         }
 
     }

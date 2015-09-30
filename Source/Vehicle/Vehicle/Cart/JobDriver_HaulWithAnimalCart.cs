@@ -17,7 +17,7 @@ namespace ToolsForHaul
         private const TargetIndex StoreCellInd = TargetIndex.B;
         private const TargetIndex CarrierInd = TargetIndex.C;
         private const int defaultWaitWorker = 2400;
-        private const int tickCheckInterval = 120;
+        private const int tickCheckInterval = 60;
 
         public JobDriver_HaulWithAnimalCart() : base() { }
 
@@ -51,7 +51,7 @@ namespace ToolsForHaul
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            Vehicle_Cart vehicle = CurJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
+            Vehicle_Cart cart = CurJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
             Job jobNew = new Job();
 
 
@@ -60,7 +60,7 @@ namespace ToolsForHaul
             ///
 
             this.FailOnDestroyed(CarrierInd);
-            this.FailOn(() => !vehicle.mountableComp.IsMounted);
+            this.FailOn(() => !cart.mountableComp.IsMounted);
             //Note we only fail on forbidden if the target doesn't start that way
             //This helps haul-aside jobs on forbidden items
             if (!TargetThingA.IsForbidden(pawn.Faction))
@@ -100,8 +100,8 @@ namespace ToolsForHaul
                                                                         TraverseParms.For(pawn, Danger.Some),
                                                                         3,
                                                                         t => t.def.defName == CurJob.targetA.Thing.def.defName && !CurJob.targetQueueA.Contains(t));
-                if (thing != null && vehicle.storage.Count + CurJob.targetQueueA.Count < vehicle.MaxItem
-                    && vehicle.storage.TotalStackCount + CurJob.targetQueueA.Sum(t => t.Thing.stackCount) < vehicle.GetMaxStackCount && Find.Reservations.CanReserve(pawn, thing))
+                if (thing != null && cart.storage.Count + CurJob.targetQueueA.Count < cart.MaxItem
+                    && cart.storage.TotalStackCount + CurJob.targetQueueA.Sum(t => t.Thing.stackCount) < cart.GetMaxStackCount && Find.Reservations.CanReserve(pawn, thing))
                 {
                     CurJob.targetQueueA.Add(thing);
                     Find.Reservations.Reserve(pawn, thing);
@@ -113,16 +113,16 @@ namespace ToolsForHaul
             Toil toilCallAnimalCartInThing = new Toil();
             toilCallAnimalCartInThing.initAction = () =>
             {
-                jobNew = new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), CurJob.GetTarget(HaulableInd), defaultWaitWorker);
-                vehicle.mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);
+                jobNew = new Job(DefDatabase<JobDef>.GetNamed("Standby"), CurJob.GetTarget(HaulableInd), defaultWaitWorker);
+                cart.mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);
             };
             toilCallAnimalCartInThing.FailOnDestroyed(HaulableInd);
 
             Toil toilCallAnimalCartInCell = new Toil();
             toilCallAnimalCartInCell.initAction = () =>
 	        {
-                jobNew = new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), CurJob.GetTarget(StoreCellInd), defaultWaitWorker);
-                vehicle.mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);  
+                jobNew = new Job(DefDatabase<JobDef>.GetNamed("Standby"), CurJob.GetTarget(StoreCellInd), defaultWaitWorker);
+                cart.mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);  
 	        };
 
 
@@ -130,34 +130,38 @@ namespace ToolsForHaul
             int tickTime = 0;
             toilWaitAnimalCart.initAction = () =>
             {
+                Pawn actor = CurToil.actor;
                 tickTime = 0;
-                if (vehicle.mountableComp.IsMounted)
+                if (cart.mountableComp.IsMounted)
                 {
                     //Worker is arrival and Animal cart is coming
-                    if (vehicle.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) && vehicle.mountableComp.Driver.pather.Moving)
+                    if (cart.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) && !actor.Position.AdjacentTo8WayOrInside(cart))
                         tickTime = 0;
                     //Worker is arrival and Animal cart is arrival
-                    else if (vehicle.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) && !vehicle.mountableComp.Driver.pather.Moving)
+                    else if (cart.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) && actor.Position.AdjacentTo8WayOrInside(cart))
                         ReadyForNextToil();
                     //Worker is arrival but Animal cart is missing
                     else
                     {
-                        jobNew = new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), GetActor().jobs.curJob.GetTarget(HaulableInd), defaultWaitWorker);
-                        vehicle.mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);
+                        jobNew = new Job(DefDatabase<JobDef>.GetNamed("Standby"), GetActor().jobs.curJob.GetTarget(HaulableInd), defaultWaitWorker);
+                        cart.mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.InterruptForced);
                     }
                 }
                 else
                     EndJobWith(JobCondition.Incompletable);
             };
             toilWaitAnimalCart.tickAction = () => 
-            { 
+            {
+                Pawn actor = CurToil.actor;
                 tickTime++;
                 if (tickTime % tickCheckInterval == 0)
-                    if (vehicle.mountableComp.IsMounted)
+                    if (cart.mountableComp.IsMounted)
                     {
-                        if (vehicle.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) && !vehicle.mountableComp.Driver.pather.Moving)
+                        //Animal cart is arrival
+                        if (cart.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) && actor.Position.AdjacentTo8WayOrInside(cart))
                             ReadyForNextToil();
-                        else if (vehicle.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) || tickTime >= defaultWaitWorker)
+                        //Animal cart would never come. Imcompletable.
+                        else if (!cart.mountableComp.Driver.CurJob.JobIsSameAs(jobNew) || tickTime >= defaultWaitWorker)
                             EndJobWith(JobCondition.Incompletable);
                     }
                     else
@@ -168,8 +172,8 @@ namespace ToolsForHaul
             Toil toilEnd = new Toil();
             toilEnd.initAction = () =>
             {
-                if (vehicle.mountableComp.IsMounted && vehicle.mountableComp.Driver.CurJob.JobIsSameAs(jobNew))
-                    vehicle.mountableComp.Driver.jobs.curDriver.EndJobWith(JobCondition.Succeeded);
+                if (cart.mountableComp.IsMounted && cart.mountableComp.Driver.CurJob.JobIsSameAs(jobNew))
+                    cart.mountableComp.Driver.jobs.curDriver.EndJobWith(JobCondition.Succeeded);
             };
 
             Toil toilCheckStoreCellEmpty = Toils_Jump.JumpIf(toilEnd, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
@@ -186,7 +190,7 @@ namespace ToolsForHaul
 
             
             yield return Toils_Goto.GotoThing(CarrierInd, PathEndMode.Touch)
-                                        .FailOn(() => vehicle.Destroyed || !vehicle.TryGetComp<CompMountable>().IsMounted);
+                                        .FailOn(() => cart.Destroyed || !cart.TryGetComp<CompMountable>().IsMounted);
             
             //yield return Toils_Jump.JumpIf(toilCheckStoreCellEmpty, () => CurJob.GetTargetQueue(HaulableInd).NullOrEmpty());
             yield return toilCheckHaulableEmpty;
@@ -204,7 +208,6 @@ namespace ToolsForHaul
 
                 yield return toilWaitAnimalCart;
 
-                //CollectIntoCarrier
                 yield return ToolsForHaul.Toils_Collect.CollectInCarrier(CarrierInd, HaulableInd);
  
                 yield return toilCheckDuplicates;
@@ -226,7 +229,6 @@ namespace ToolsForHaul
 
                 yield return toilWaitAnimalCart;
 
-                //CollectIntoCarrier
                 yield return ToolsForHaul.Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, CarrierInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, extractB);

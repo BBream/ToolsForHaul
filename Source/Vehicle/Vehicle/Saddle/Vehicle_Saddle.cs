@@ -42,7 +42,7 @@ namespace ToolsForHaul
                 Messages.Message(pawn.LabelCap + "cannot board on " + this.LabelCap + ": " + pawn.LabelCap + "is starving or exhausted", MessageSound.RejectInput);
                 return;
             }
-            Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("GotoAndWait"), mountableComp.Driver.Position, 4800);
+            Job jobNew = new Job(DefDatabase<JobDef>.GetNamed("Standby"), mountableComp.Driver.Position, 4800);
             mountableComp.Driver.jobs.StartJob(jobNew, JobCondition.Incompletable);
 
             this.storage.TryAdd(pawn);

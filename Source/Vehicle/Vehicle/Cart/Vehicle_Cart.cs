@@ -15,6 +15,7 @@ namespace ToolsForHaul
 
         #region Variables
         // ==================================
+        private const int maxItemPerBodySize = 4;
 
         //Graphic data
         private Graphic_Multi graphic_Handle;
@@ -38,7 +39,14 @@ namespace ToolsForHaul
         //slotGroupParent Interface
         public ThingFilter allowances;
 
-        public int MaxItem { get { return (mountableComp.IsMounted && mountableComp.Driver.RaceProps.Animal)? 6 : 3; } }
+        public int MaxItem 
+        { 
+            get 
+            { 
+                return (mountableComp.IsMounted && mountableComp.Driver.RaceProps.Animal)? 
+                    Mathf.CeilToInt(mountableComp.Driver.BodySize * maxItemPerBodySize) : 3; 
+            } 
+        }
         public int GetMaxStackCount { get { return MaxItem * 100; } }
 
         int tickTime = 0;

@@ -10,17 +10,17 @@ using RimWorld;
 
 namespace ToolsForHaul
 {
-    class JobDriver_GotoAndWait : JobDriver
+    class JobDriver_Standby : JobDriver
     {
         //Constants
         private const TargetIndex DestInd = TargetIndex.A;
 
-        public JobDriver_GotoAndWait() : base() { }
+        public JobDriver_Standby() : base() { }
 
         public override string GetReport()
         {
             string repString;
-            repString = "ReportStandby".Translate(TargetA.Cell);
+            repString = "ReportStandby".Translate();
 
             return repString;
         }
@@ -31,7 +31,7 @@ namespace ToolsForHaul
             //Set fail conditions
             ///
 
-            this.FailOn(() => TargetA.Cell == IntVec3.Invalid);
+            this.FailOn(() => !TargetA.Cell.IsValid);
             this.FailOnBurningImmobile(DestInd);
 
             ///

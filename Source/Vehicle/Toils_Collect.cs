@@ -151,7 +151,21 @@ public static class Toils_Collect
 
             Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
             actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
-            //dropThing.holder = null;
+
+            //Check cell queue is adjacent
+            List<TargetInfo> cellList = curJob.GetTargetQueue(StoreCellInd);
+            for (int i = 0; i < cellList.Count && i < actor.inventory.container.Count; i++)
+                if (destLoc.AdjacentTo8Way(cellList[i].Cell))
+                {
+                    Find.DesignationManager.RemoveAllDesignationsOn(actor.inventory.container[i]);
+                    actor.inventory.container.TryDrop(actor.inventory.container[i], cellList[i].Cell, ThingPlaceMode.Direct, out dummy);
+                    cellList.RemoveAt(i);
+                    i--;
+                }
+            //Check item queue is valid storage for adjacent cell
+            foreach (IntVec3 adjCell in GenAdj.CellsAdjacent8Way(destLoc))
+                if (actor.inventory.container.Count > 0 && StoreUtility.IsValidStorageFor(adjCell, actor.inventory.container.First()))
+                    actor.inventory.container.TryDrop(actor.inventory.container.First(), adjCell, ThingPlaceMode.Direct, out dummy);
 
             return;
         };
@@ -168,7 +182,7 @@ public static class Toils_Collect
             if (actor.inventory.container.Count <= 0)
                 return;
 
-            //Thing dropThing = actor.inventory.container.First();
+            //Check dropThing is last item that should not be dropped
             Thing dropThing = null;
             if (lastItem != null)
             {
@@ -212,29 +226,21 @@ public static class Toils_Collect
 
             Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
             carrier.storage.TryDrop(dropThing, destLoc, placeMode, out dummy);
-            //dropThing.holder = null;
 
-            //List<Thing> dropThings = carrier.storage.ToList();
+            //Check cell queue is adjacent
             List<TargetInfo> cellList = curJob.GetTargetQueue(StoreCellInd);
-            /*while (0 < cellList.Count && 0 < carrier.storage.Count)
-                if (destLoc.AdjacentTo8Way(cellList.First().Cell))
-                {
-                    Find.DesignationManager.RemoveAllDesignationsOn(actor.inventory.container.First());
-                    actor.inventory.container.TryDrop(actor.inventory.container.First(), cellList.First().Cell, ThingPlaceMode.Direct, out dummy);
-                    cellList.RemoveAt(0);
-                }
-            */
-            for (int i = 0; i < cellList.Count && 0 < cellList.Count && i < carrier.storage.Count && 0 < carrier.storage.Count; i++)
+            for (int i = 0; i < cellList.Count && i < carrier.storage.Count; i++)
                 if (destLoc.AdjacentTo8Way(cellList[i].Cell))
                 {
                     Find.DesignationManager.RemoveAllDesignationsOn(carrier.storage[i]);
                     carrier.storage.TryDrop(carrier.storage[i], cellList[i].Cell, ThingPlaceMode.Direct, out dummy);
-                    //dropThing.holder = null;
                     cellList.RemoveAt(i);
-                    //dropThings.RemoveAt(dropThings.IndexOf(dropThings[i]));
                     i--;
                 }
-
+            //Check item queue is valid storage for adjacent cell
+            foreach (IntVec3 adjCell in GenAdj.CellsAdjacent8Way(destLoc))
+                if (carrier.storage.Count > 0 && StoreUtility.IsValidStorageFor(adjCell, carrier.storage.First()))
+                    carrier.storage.TryDrop(carrier.storage.First(), adjCell, ThingPlaceMode.Direct, out dummy);
             return;
         };
         toil.FailOnDespawned(CarrierInd);
