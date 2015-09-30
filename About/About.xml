@@ -5,7 +5,7 @@
 	<targetVersion>Alpha 12d</targetVersion>
 	<description>
   https://ludeon.com/forums/index.php?topic=12282.0
-	Version V1.5
+	Version V1.5a
 	
   Contents List:
 	- Cart for hauling
@@ -13,9 +13,14 @@
   - Saddle for rider
 		
   Change Log
+  V1.5a
+  - 5 bugs are fixed. See this. https://github.com/BBream/ToolsForHaul/issues?q=is%3Aissue+is%3Aclosed
+  - Animals can haul item depending on their body size. For example, muffalo has 2.0 body size and factor is 4.
+  So, muffalo can haul 8 items. You can see body size in information window.(Carring capacity)
+  
   V1.5
-  - Cart can be mounted in animal's back. For this, Animal should be trained for 'Obeidence' and bigger than human.(baseBodySize >= 1.0)
-  This is list of animal can mount cart: 
+  - Cart and saddle can be mounted in animal's back. For this, Animal should be trained for 'Obeidence' and bigger than human.(baseBodySize >= 1.0)
+  This is list of animal can mount cart and saddle: 
     Warg, Husky, LabradorRetriever, Elk, Thrumbo, Boomalope, Muffalo, Rhinoceros, Dromedary, Elephant, Cow, Alpaca.
   - Cart has been nerfed. Maximum items humanlike can haul with cart is changed from 6 items or 600 stacks to 3 items or 300 stacks. 
   Instead, Maximum items animal can haul with cart is 6 items or 600 stacks.

@@ -60,9 +60,9 @@
   </JobDef>
   
   <JobDef>
-    <defName>GotoAndWait</defName>
-    <driverClass>ToolsForHaul.JobDriver_GotoAndWait</driverClass>
-    <reportString>Go and wait on TargetA.</reportString>
+    <defName>Standby</defName>
+    <driverClass>ToolsForHaul.JobDriver_Standby</driverClass>
+    <reportString>Standing by</reportString>
   </JobDef>
   
 <!-- 

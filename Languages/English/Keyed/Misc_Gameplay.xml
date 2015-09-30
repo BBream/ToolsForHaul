@@ -8,7 +8,7 @@
   <ReportPutInInventory>Put {0} in {1}.</ReportPutInInventory>
   <ReportPutSomethingInInventory>Put something in {1}.</ReportPutSomethingInInventory>
   <ReportBoarding>Boarding {0}.</ReportBoarding>
-  <ReportStandby>Standing by on {0}</ReportStandby> 
+  <ReportStandby>Standing by</ReportStandby> 
   
   <!-- Cart -->
   <InStorage>In Storage: </InStorage>

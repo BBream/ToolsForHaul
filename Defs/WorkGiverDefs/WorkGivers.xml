@@ -16,23 +16,12 @@
   
   <!-- ============= Driver ============= -->
  
-<!--   <WorkGiverDef>
-    <defName>HaulWithAnimalCart</defName>
-    <giverClass>ToolsForHaul.WorkGiver_HaulWithAnimalCart</giverClass>
-    <workType>Hauling</workType>
-    <priorityInType>16</priorityInType>
-    <verb>haul with animal cart</verb>
-    <gerund>hauling with animal cart</gerund>
-    <requiredCapacities>
-      <li>Manipulation</li>
-    </requiredCapacities>
-  </WorkGiverDef> -->
- 
   <WorkGiverDef>
     <defName>HaulWithCart</defName>
     <giverClass>ToolsForHaul.WorkGiver_HaulWithCart</giverClass>
     <workType>Hauling</workType>
     <priorityInType>15</priorityInType>
+    <scanThings>true</scanThings>
     <verb>haul with cart</verb>
     <gerund>hauling with cart</gerund>
     <requiredCapacities>
@@ -56,8 +45,8 @@
     <defName>DismountInBase</defName>
     <giverClass>ToolsForHaul.WorkGiver_DismountInBase</giverClass>
     <workType>Hauling</workType>
-    <!-- <emergency>true</emergency> -->
     <priorityInType>3</priorityInType>
+    <scanThings>true</scanThings>
     <verb>haul</verb>
     <gerund>hauling</gerund>
     <requiredCapacities>
