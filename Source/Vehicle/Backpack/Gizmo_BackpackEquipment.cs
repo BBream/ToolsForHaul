@@ -14,10 +14,11 @@ namespace ToolsForHaul
 {
     public class Gizmo_BackpackEquipment : Gizmo
     {
-        private const string txtNoDoctor = "NoDoctor";
-        private const string txtCannotEatAnymore = "CannotEatAnymore";
-
-        private const string txtNoItem = "NoItem";
+        private static string txtNoDoctor;
+        private static string txtCannotEatAnymore;
+        private static string txtNoItem;
+        private static string txtThingInfo;
+        private static string txtDropThing;
 
         //Links
         public Apparel_Backpack backpack;
@@ -31,7 +32,6 @@ namespace ToolsForHaul
         //private static readonly ThingCategoryDef weaponRanged = DefDatabase<ThingCategoryDef>.GetNamed("WeaponsRanged");
         private static readonly ThingCategoryDef medicine = DefDatabase<ThingCategoryDef>.GetNamed("Medicine");
         private static readonly ThingCategoryDef foodMeals = DefDatabase<ThingCategoryDef>.GetNamed("FoodMeals");
-        
 
         //Properties
         private const int textHeight = 30;
@@ -47,13 +47,17 @@ namespace ToolsForHaul
         //IconClickSound
         private SoundDef thingIconSound;
 
-
+        public Gizmo_BackpackEquipment()
+        {
+            Gizmo_BackpackEquipment.txtNoDoctor = Translator.Translate("NoDoctor");
+            Gizmo_BackpackEquipment.txtCannotEatAnymore = Translator.Translate("CannotEatAnymore");
+            Gizmo_BackpackEquipment.txtNoItem = Translator.Translate("NoItem");
+            Gizmo_BackpackEquipment.txtThingInfo = Translator.Translate("ThingInfo");
+            Gizmo_BackpackEquipment.txtDropThing = Translator.Translate("DropThing");
+        }
 
         public override GizmoResult GizmoOnGUI(UnityEngine.Vector2 topLeft)
         {
-            #if DEBUG
-            Log.Message("In " + System.Reflection.MethodBase.GetCurrentMethod() + " Memory usage: " + GC.GetTotalMemory(false));
-            #endif
             Rect overRect = new Rect(topLeft.x, topLeft.y, curWidth, Height);
             Widgets.DrawWindowBackground(overRect);
 
@@ -181,11 +185,11 @@ namespace ToolsForHaul
                     else if (Event.current.button == 1)
                     {
                         List<FloatMenuOption> options = new List<FloatMenuOption>();
-                        options.Add(new FloatMenuOption(Translator.Translate("ThingInfo"), () =>
+                        options.Add(new FloatMenuOption(txtThingInfo, () =>
                         {
                             Find.WindowStack.Add((Window)new Dialog_InfoCard(item));
                         }));
-                        options.Add(new FloatMenuOption(Translator.Translate("DropThing"), () =>
+                        options.Add(new FloatMenuOption(txtDropThing, () =>
                         {
                             Thing dummy1;
                             wearer.inventory.container.TryDrop(item, wearer.Position, ThingPlaceMode.Near, out dummy1);
@@ -207,10 +211,6 @@ namespace ToolsForHaul
                 Rect textRect = new Rect(topLeft.x + Width / 2 - textWidth / 2, topLeft.y + Height / 2 - textHeight / 2, textWidth, textHeight);
                 Widgets.Label(textRect, txtNoItem.Translate());
             }         
-
-            #if DEBUG
-            Log.Message("In End of " + System.Reflection.MethodBase.GetCurrentMethod() + " Memory usage: " + GC.GetTotalMemory(false));
-            #endif
             return new GizmoResult(GizmoState.Clear);
         }
 

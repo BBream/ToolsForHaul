@@ -13,6 +13,10 @@
   - Saddle for rider
 		
   Change Log
+  V1.5b
+  - Texture is changed.
+  - Code is refined.
+  
   V1.5a
   - 5 bugs are fixed. See this. https://github.com/BBream/ToolsForHaul/issues?q=is%3Aissue+is%3Aclosed
   - Animals can haul item depending on their body size. For example, muffalo has 2.0 body size and factor is 4.

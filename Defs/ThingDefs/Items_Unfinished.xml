@@ -44,6 +44,7 @@
     <graphicData>
       <texPath>Things/Pawn/Vehicle/Cart</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(3,3)</drawSize>
     </graphicData>
     <stuffCategories>
       <li>Metallic</li>

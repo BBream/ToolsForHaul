@@ -24,18 +24,20 @@ namespace ToolsForHaul
         public virtual IEnumerable<Gizmo> GetWornGizmos();
         */
 
-        private const string DesignatorPutInInventoryDefaultLabel = "DesignatorPutInDefaultLabel";
-        private const string DesignatorPutInInventoryDefaultDesc = "DesignatorPutInDefaultDesc";
+        private static string DesignatorPutInInventoryDefaultLabel = Translator.Translate("DesignatorPutInDefaultLabel");
+        private static string DesignatorPutInInventoryDefaultDesc = Translator.Translate("DesignatorPutInDefaultDesc");
         private static readonly StatDef backpackMaxItem = DefDatabase<StatDef>.GetNamed("BackpackMaxItem");
 
         public int maxItem;
+        public int numOfSavedItems;
         public Pawn postWearer;
 
-        public int maxStack { get { return maxItem * 1; } }
+        public int maxStack { get { return maxItem * 75; } }
 
         public Apparel_Backpack() : base()
         {
             postWearer = null;
+            numOfSavedItems = 0;
         }
 
         public override void SpawnSetup()
@@ -48,6 +50,7 @@ namespace ToolsForHaul
         {
             base.ExposeData();
             Scribe_Values.LookValue<int>(ref maxItem, "maxItem", (int)this.GetStatValue(backpackMaxItem));
+            Scribe_Values.LookValue<int>(ref numOfSavedItems, "numOfSavedItems", 0);
         }
 
         public override void Draw()
@@ -69,7 +72,10 @@ namespace ToolsForHaul
             {
                 postWearer.inventory.container.TryDropAll(postWearer.Position, ThingPlaceMode.Near);
                 postWearer = null;
+                numOfSavedItems = 0;
             }
+            if (wearer != null && numOfSavedItems > wearer.inventory.container.Count)
+                numOfSavedItems = wearer.inventory.container.Count;
         }
 
         public override IEnumerable<Gizmo> GetWornGizmos()
@@ -78,8 +84,8 @@ namespace ToolsForHaul
 
             designator.backpack = this;
             designator.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconPutIn");
-            designator.defaultLabel = DesignatorPutInInventoryDefaultLabel.Translate() + "(" + wearer.inventory.container.TotalStackCount + "/" + maxStack + ")";
-            designator.defaultDesc = DesignatorPutInInventoryDefaultDesc.Translate() + wearer.inventory.container.TotalStackCount + "/" + maxStack;
+            designator.defaultLabel = DesignatorPutInInventoryDefaultLabel + "(" + wearer.inventory.container.Count + "/" + maxItem + ")";
+            designator.defaultDesc = DesignatorPutInInventoryDefaultDesc + wearer.inventory.container.Count + "/" + maxItem;
             designator.hotKey = KeyBindingDef.Named("CommandPutInInventory");
             designator.activateSound = SoundDef.Named("Click");
 

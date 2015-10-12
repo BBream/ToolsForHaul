@@ -55,8 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Backpack\Apparel_Backpack.cs" />
+    <Compile Include="ToolsForHaulUtility.cs" />
     <Compile Include="Vehicle\Cart\JobDriver_Standby.cs" />
     <Compile Include="Vehicle\Cart\JobDriver_HaulWithAnimalCart.cs" />
+    <Compile Include="Vehicle\Cart\Toils_Cart.cs" />
+    <Compile Include="Vehicle\Cart\WorkGiver_HaulWithCart.cs" />
     <Compile Include="Vehicle\CompMountable.cs" />
     <Compile Include="Backpack\Designator_ApplyMedicine.cs" />
     <Compile Include="Backpack\Designator_InstallForBackpack.cs" />
@@ -85,8 +88,6 @@
     <Compile Include="Vehicle\Saddle\Vehicle_Saddle.cs" />
     <Compile Include="Vehicle\WorkGiver_DismountInBase.cs" />
     <Compile Include="Backpack\WorkGiver_HaulWithBackpack.cs" />
-    <Compile Include="Vehicle\Cart\WorkGiver_HaulWithCart.cs" />
-    <Compile Include="WorkGiver_HaulWithTools.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

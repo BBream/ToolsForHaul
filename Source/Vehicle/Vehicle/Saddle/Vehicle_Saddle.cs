@@ -101,6 +101,16 @@ namespace ToolsForHaul
             Scribe_Deep.LookDeep<ThingContainer>(ref storage, "storage");
         }
 
+        public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
+        {
+            UnboardAll();
+            this.storage.TryDropAll(this.Position, ThingPlaceMode.Near);
+
+            if (mode == DestroyMode.Deconstruct)
+                mode = DestroyMode.Kill;
+            base.Destroy(mode);
+        }
+
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var baseGizmo in base.GetGizmos())
@@ -166,15 +176,6 @@ namespace ToolsForHaul
 
                 yield return fmoBoard;
             }
-        }
-
-        public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
-        {
-            this.storage.TryDropAll(this.Position, ThingPlaceMode.Near);
-
-            if (mode == DestroyMode.Deconstruct)
-                mode = DestroyMode.Kill;
-            base.Destroy(mode);
         }
 
         /// <summary>

@@ -20,15 +20,11 @@ namespace ToolsForHaul
         //Graphic data
         private Graphic_Multi graphic_Handle;
         private Graphic_Multi graphic_Wheel;
+        private Graphic_Multi graphic_FullStorage;
         //Body and part location
         private Vector3 handleLoc;
         private Vector3 wheelLoc;
         private Vector3 bodyLoc;
-
-        //storage item location
-        private Vector3 itemLoc;
-        private Vector3 itemOffset;
-
 
         //mount and storage data
         public CompMountable mountableComp;
@@ -126,17 +122,6 @@ namespace ToolsForHaul
             base.Destroy(mode);
         }
 
-        /// <summary>
-        /// Import the graphics
-        /// </summary>
-        private void UpdateGraphics()
-        {
-            graphic_Wheel = new Graphic_Multi();
-            graphic_Wheel = GraphicDatabase.Get<Graphic_Multi>("Things/Pawn/Vehicle/Cart_Wheel", def.graphic.Shader, def.graphic.drawSize, def.graphic.color, def.graphic.colorTwo) as Graphic_Multi;
-            graphic_Handle = new Graphic_Multi();
-            graphic_Handle = GraphicDatabase.Get<Graphic_Multi>("Things/Pawn/Vehicle/Cart_Handle", def.graphic.Shader, def.graphic.drawSize, def.graphic.color, def.graphic.colorTwo) as Graphic_Multi;
-        }
-
         #endregion
 
         #region Ticker
@@ -156,9 +141,25 @@ namespace ToolsForHaul
         #region Graphics / Inspections
         // ==================================
 
-        /// <summary>
-        /// 
-        /// </summary>
+        private void UpdateGraphics()
+        {
+            graphic_Wheel = new Graphic_Multi();
+            graphic_Wheel = GraphicDatabase.Get<Graphic_Multi>("Things/Pawn/Vehicle/Cart_Wheel", def.graphic.Shader, def.graphic.drawSize, def.graphic.color, def.graphic.colorTwo) as Graphic_Multi;
+            graphic_Handle = new Graphic_Multi();
+            graphic_Handle = GraphicDatabase.Get<Graphic_Multi>("Things/Pawn/Vehicle/Cart_Handle", def.graphic.Shader, def.graphic.drawSize, def.graphic.color, def.graphic.colorTwo) as Graphic_Multi;
+            graphic_FullStorage = new Graphic_Multi();
+            graphic_FullStorage = GraphicDatabase.Get<Graphic_Multi>("Things/Pawn/Vehicle/Cart_FullStorage", def.graphic.Shader, def.graphic.drawSize, def.graphic.color, def.graphic.colorTwo) as Graphic_Multi;
+        }
+
+        public override Graphic Graphic
+        {
+            get
+            {
+                if (graphic_FullStorage == null)
+                    UpdateGraphics();
+                return (this.storage.Count > 0)? graphic_FullStorage : base.Graphic;
+            }
+        }
         public override Vector3 DrawPos
         {
             get
@@ -179,12 +180,8 @@ namespace ToolsForHaul
 
             //Body and part location
             handleLoc = drawLoc; handleLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Waist) + 0.01f;
-            wheelLoc = drawLoc; wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Waist) + 0.04f;
-            bodyLoc = drawLoc; bodyLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Waist) + 0.03f;
-
-            //storage item location
-            itemLoc = drawLoc; itemLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Waist);
-            itemOffset = new Vector3(0.02f, 0, 0).RotatedBy(this.Rotation.AsAngle);
+            wheelLoc = drawLoc; wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.04f;
+            bodyLoc = drawLoc; bodyLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.03f;
 
             if (mountableComp.IsMounted && mountableComp.Driver.pather.Moving)
             {
@@ -193,42 +190,11 @@ namespace ToolsForHaul
             }
 
             if (this.Rotation.AsInt % 2 == 0) //Vertical
-                wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Waist) + 0.02f;
+                wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.02f;
 
             base.DrawAt(bodyLoc);
             graphic_Wheel.Draw(wheelLoc, this.Rotation, this);
             graphic_Handle.Draw(handleLoc, this.Rotation, this);
-
-
-            if (this.storage.Count > 0)
-            {
-                float i = 0f;
-                itemOffset.x -= 0.06f;
-                foreach (var thing in this.storage)
-                {
-                    i += 0.01f;
-                    itemLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Waist) + 0.05f + i;
-                    itemOffset.x += i * 3;
-                    itemOffset.z = (this.Position.z % 10) / 100;
-                    itemOffset = itemOffset.RotatedBy(this.Rotation.AsAngle);
-                    if ((thing.ThingID.IndexOf("Corpse") <= -1) ? false : true)
-                    {
-                        Corpse corpse = thing as Corpse;
-                        RotDrawMode rotDrawMode = RotDrawMode.Fresh;
-                        CompRottable rottable = GetComp<CompRottable>();
-                        if (rottable != null)
-                        {
-                            if (rottable.Stage == RotStage.Rotting)
-                                rotDrawMode = RotDrawMode.Rotting;
-                            else if (rottable.Stage == RotStage.Dessicated)
-                                rotDrawMode = RotDrawMode.Dessicated;
-                        }
-                        corpse.innerPawn.drawer.renderer.RenderPawnAt(itemLoc + itemOffset, rotDrawMode);
-                    }
-                    else
-                        thing.Graphic.Draw(itemLoc + itemOffset, this.Rotation, this);
-                }
-            }
         }
 
         public override string GetInspectString()

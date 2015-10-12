@@ -15,7 +15,7 @@ namespace ToolsForHaul
         //Constants
         private const TargetIndex HaulableInd = TargetIndex.A;
         private const TargetIndex StoreCellInd = TargetIndex.B;
-        private const TargetIndex CarrierInd = TargetIndex.C;
+        private const TargetIndex BackpackInd = TargetIndex.C;
 
         public JobDriver_HaulWithBackpack() : base() { }
 
@@ -23,7 +23,7 @@ namespace ToolsForHaul
         {
             Thing hauledThing = null;
             hauledThing = TargetThingA;
-            IntVec3 destLoc = new IntVec3(-1000, -1000, -1000);
+            IntVec3 destLoc = IntVec3.Invalid;
             string destName = null;
             SlotGroup destGroup = null;
 
@@ -37,75 +37,37 @@ namespace ToolsForHaul
                 destName = destGroup.parent.SlotYielderLabel();
 
             string repString;
-            if (destName != null)
+            if (destName != null && hauledThing != null)
                 repString = "ReportHaulingTo".Translate(hauledThing.LabelCap, destName);
-            else
+            else if (hauledThing != null)
                 repString = "ReportHauling".Translate(hauledThing.LabelCap);
-
+            else
+                repString = "ReportHauling".Translate();
             return repString;
         }
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            Apparel_Backpack backpack = CurJob.GetTarget(CarrierInd).Thing as Apparel_Backpack;
+            Apparel_Backpack backpack = CurJob.GetTarget(BackpackInd).Thing as Apparel_Backpack;
             Thing lastItem = null;
-            if (pawn.inventory.container != null && pawn.inventory.container.Count > 0)
-                lastItem = pawn.inventory.container.Last();
-            //Thing lastItem = CurJob.targetA.Thing;
+            Thing foodInInventory = FoodUtility.FoodInInventory(pawn);
+            if (pawn.inventory.container != null && pawn.inventory.container.Count > 0 && backpack.numOfSavedItems > 0)
+                lastItem = pawn.inventory.container[backpack.numOfSavedItems - 1];
+            if (foodInInventory != null && backpack.numOfSavedItems < pawn.inventory.container.Count)
+                lastItem = foodInInventory;
+
             ///
             //Set fail conditions
             ///
-
-            //this.FailOnDestroyed(HaulableInd);
-            //this.FailOnBurningImmobile(StoreCellInd);
 
             ///
             //Define Toil
             ///
 
-            Toil extractA = new Toil();
-            extractA.initAction = () =>
-            {
-                if (!CurJob.targetQueueA.NullOrEmpty())
-                {
-                    CurJob.targetA = CurJob.targetQueueA.First();
-                    CurJob.targetQueueA.RemoveAt(0);
-                }
-            };
-
-            Toil extractB = new Toil();
-            extractB.initAction = () =>
-            {
-                if (!CurJob.targetQueueB.NullOrEmpty())
-                {
-                    CurJob.targetB = CurJob.targetQueueB.First();
-                    CurJob.targetQueueB.RemoveAt(0);
-                }
-            };
-
-            Toil toilCheckDuplicates = new Toil();
-            toilCheckDuplicates.initAction = () =>
-            {
-                Thing thing = GenClosest.ClosestThing_Global_Reachable(pawn.Position,
-                                                                        ListerHaulables.ThingsPotentiallyNeedingHauling(),
-                                                                        PathEndMode.Touch,
-                                                                        TraverseParms.For(pawn, Danger.Some),
-                                                                        3,
-                                                                        t => t.def.defName == CurJob.targetA.Thing.def.defName && !CurJob.targetQueueA.Contains(t));
-                if (thing != null && pawn.inventory.container.Count + CurJob.targetQueueA.Count < backpack.maxItem
-                    && pawn.inventory.container.TotalStackCount + CurJob.targetQueueA.Sum(t => t.Thing.stackCount) < backpack.maxItem * 100 && Find.Reservations.CanReserve(pawn, thing))
-                {
-                    CurJob.targetQueueA.Add(thing);
-                    Find.Reservations.Reserve(pawn, thing);
-                    JumpToToil(extractA);
-                }
-            };
-
-            Toil toilEnd = new Toil();
-            toilEnd.initAction = () => {};
-
-            Toil toilCheckStoreCellEmpty = Toils_Jump.JumpIf(toilEnd, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
-            Toil toilCheckHaulableEmpty = Toils_Jump.JumpIf(toilCheckStoreCellEmpty, () => CurJob.GetTargetQueue(HaulableInd).NullOrEmpty());
+            Toil endOfJob = new Toil();
+                endOfJob.initAction = () => { EndJobWith(JobCondition.Succeeded); };
+            Toil checkStoreCellEmpty = Toils_Jump.JumpIf(endOfJob, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
+            Toil checkHaulableEmpty = Toils_Jump.JumpIf(checkStoreCellEmpty, () => CurJob.GetTargetQueue(HaulableInd).NullOrEmpty());
 
             ///
             //Toils Start
@@ -115,47 +77,41 @@ namespace ToolsForHaul
             yield return Toils_Reserve.ReserveQueue(HaulableInd);
             yield return Toils_Reserve.ReserveQueue(StoreCellInd);
 
-            //yield return Toils_Jump.JumpIf(toilCheckStoreCellEmpty, () => CurJob.GetTargetQueue(HaulableInd).NullOrEmpty());
-            yield return toilCheckHaulableEmpty;
+            //JumpIf checkStoreCellEmpty
+            yield return checkHaulableEmpty;
 
             //Collect TargetQueue
             {
-
-                //Extract an haulable into TargetA
+                Toil extractA = Toils_Collect.Extract(HaulableInd);
                 yield return extractA;
 
                 yield return Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
                                               .FailOnDestroyed(HaulableInd);
 
-                //yield return Toils_Haul.StartCarryThing(HaulableInd);
-
-                //It won't put off human corpse.
-                //yield return Toils_General.PutCarriedThingInInventory();
-
-                //CollectIntoCarrier
                 yield return ToolsForHaul.Toils_Collect.CollectInInventory(HaulableInd);
- 
-                yield return toilCheckDuplicates;
+
+                yield return Toils_Collect.CheckDuplicates(extractA, BackpackInd, HaulableInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(HaulableInd, extractA);
             }
 
-            //Toil toilCheckStoreCellEmpty = Toils_Jump.JumpIf(toilEnd, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
-            yield return toilCheckStoreCellEmpty;
+            //JumpIf toilEnd
+            yield return checkStoreCellEmpty;
 
             //Drop TargetQueue
             {
-                //Extract an haulable into TargetA
+                Toil extractB = Toils_Collect.Extract(StoreCellInd);
                 yield return extractB;
 
-                yield return Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch);
+                yield return Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch)
+                                            .FailOnBurningImmobile(StoreCellInd);
 
-                //CollectIntoCarrier
                 yield return ToolsForHaul.Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, lastItem);
+
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, extractB);
             }
 
-            yield return toilEnd;
+            yield return endOfJob;
         }
 
     }
