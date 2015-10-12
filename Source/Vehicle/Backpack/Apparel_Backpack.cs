@@ -32,7 +32,7 @@ namespace ToolsForHaul
         public int numOfSavedItems;
         public Pawn postWearer;
 
-        public int maxStack { get { return maxItem * 75; } }
+        public int maxStack { get { return maxItem * 40; } }
 
         public Apparel_Backpack() : base()
         {

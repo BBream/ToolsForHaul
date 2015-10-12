@@ -49,12 +49,7 @@ namespace ToolsForHaul
         protected override IEnumerable<Toil> MakeNewToils()
         {
             Apparel_Backpack backpack = CurJob.GetTarget(BackpackInd).Thing as Apparel_Backpack;
-            Thing lastItem = null;
-            Thing foodInInventory = FoodUtility.FoodInInventory(pawn);
-            if (pawn.inventory.container != null && pawn.inventory.container.Count > 0 && backpack.numOfSavedItems > 0)
-                lastItem = pawn.inventory.container[backpack.numOfSavedItems - 1];
-            if (foodInInventory != null && backpack.numOfSavedItems < pawn.inventory.container.Count)
-                lastItem = foodInInventory;
+            Thing lastItem = ToolsForHaulUtility.TryGetBackpackLastItem(pawn);
 
             ///
             //Set fail conditions

@@ -76,8 +76,8 @@ namespace ToolsForHaul
         //Animal Cart//
         ///////////////
 
-        private const int defaultWaitWorker = 2400;
-        private const int tickCheckInterval = 60;
+        private const int defaultWaitWorker = 2056;
+        private const int tickCheckInterval = 64;
         private static readonly JobDef jobDefStandby = DefDatabase<JobDef>.GetNamed("Standby");
 
         public static Toil CallAnimalCart(TargetIndex CartInd, TargetIndex Ind)
@@ -157,8 +157,7 @@ namespace ToolsForHaul
                     Log.Error(actor.LabelCap + " Report: Cart is invalid.");
                     toil.actor.jobs.curDriver.EndJobWith(JobCondition.Errored);
                 }
-                tickTime++;
-                if (tickTime % tickCheckInterval == 0)
+                if (Find.TickManager.TicksGame % tickCheckInterval == 0)
                     if (cart.mountableComp.IsMounted)
                     {
                         //Animal cart is arrival

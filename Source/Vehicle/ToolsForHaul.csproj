@@ -62,7 +62,6 @@
     <Compile Include="Vehicle\Cart\WorkGiver_HaulWithCart.cs" />
     <Compile Include="Vehicle\CompMountable.cs" />
     <Compile Include="Backpack\Designator_ApplyMedicine.cs" />
-    <Compile Include="Backpack\Designator_InstallForBackpack.cs" />
     <Compile Include="Vehicle\Designator_Mount.cs" />
     <Compile Include="Backpack\Designator_PutInInventory.cs" />
     <Compile Include="Backpack\Gizmo_BackpackEquipment.cs" />

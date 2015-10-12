@@ -107,6 +107,8 @@ namespace ToolsForHaul
                         {
                             if (wearer.equipment.Primary != null)
                                 wearer.equipment.TryTransferEquipmentToContainer(wearer.equipment.Primary, wearer.inventory.container, out dummy);
+                            else
+                                backpack.numOfSavedItems--;
                             wearer.equipment.AddEquipment(item as ThingWithComps);
                             wearer.inventory.container.Remove(item as ThingWithComps);
                             if (wearer.jobs.curJob != null)
@@ -162,19 +164,12 @@ namespace ToolsForHaul
                                     Apparel resultingAp;
                                     wearer.apparel.TryDrop(ap, out resultingAp, wearer.Position, false);
                                     wearer.inventory.container.TryAdd(resultingAp);
+                                    backpack.numOfSavedItems++;
                                 }
                             }
                             wearer.apparel.Wear(item as Apparel);
                             wearer.inventory.container.Remove(item as ThingWithComps);
-                        }
-                        //Installing minifiedThing
-                        else if (item is MinifiedThing)
-                        {
-                            Designator_InstallForBackpack install = new Designator_InstallForBackpack();
-                            install.miniThing = item;
-                            install.wearer = wearer;
-
-                            DesignatorManager.Select(install);
+                            backpack.numOfSavedItems--;
                         }
 
                         else

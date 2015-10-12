@@ -6,7 +6,7 @@
     <defName>HaulWithBackpack</defName>
     <giverClass>ToolsForHaul.WorkGiver_HaulWithBackpack</giverClass>
     <workType>Hauling</workType>
-    <priorityInType>17</priorityInType>
+    <priorityInType>9</priorityInType>
     <verb>haul with backpack</verb>
     <gerund>hauling with backpack</gerund>
     <requiredCapacities>
@@ -20,7 +20,7 @@
     <defName>HaulWithCart</defName>
     <giverClass>ToolsForHaul.WorkGiver_HaulWithCart</giverClass>
     <workType>Hauling</workType>
-    <priorityInType>15</priorityInType>
+    <priorityInType>7</priorityInType>
     <scanThings>true</scanThings>
     <verb>haul with cart</verb>
     <gerund>hauling with cart</gerund>

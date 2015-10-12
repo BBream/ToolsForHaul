@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,15 +18,13 @@ namespace ToolsForHaul
         private static readonly JobDef jobDefHaulWithBackpack = DefDatabase<JobDef>.GetNamed("HaulWithBackpack");
         private static readonly JobDef jobDefHaulWithAnimalCart = DefDatabase<JobDef>.GetNamed("HaulWithAnimalCart");
         private static readonly JobDef jobDefHaulWithCart = DefDatabase<JobDef>.GetNamed("HaulWithCart");
-        private static IntVec3 invalidCell = new IntVec3(0, 0, 0);
         private const int NearbyCell = 10;
 
-        public static void Reset()
+        static ToolsForHaulUtility()
         {
             ToolsForHaulUtility.NoHaulable = Translator.Translate("NoHaulable");
             ToolsForHaulUtility.NoEmptyPlaceLowerTrans = Translator.Translate("NoEmptyPlaceLower");
         }
-        public static List<Thing> Cart() { return Find.ListerThings.AllThings.FindAll((Thing thing) => (thing is Vehicle_Cart)); }
         public static Apparel_Backpack TryGetBackpack(Pawn pawn)
         {
             foreach (Apparel apparel in pawn.apparel.WornApparel)
@@ -32,6 +32,21 @@ namespace ToolsForHaul
                     return apparel as Apparel_Backpack;
             return null;
         }
+        public static Thing TryGetBackpackLastItem(Pawn pawn)
+        {
+            Apparel_Backpack backpack = ToolsForHaulUtility.TryGetBackpack(pawn);
+            if (backpack == null)
+                return null;
+            Thing lastItem = null;
+            Thing foodInInventory = FoodUtility.FoodInInventory(pawn);
+            if (pawn.inventory.container.Count > 0 && backpack.numOfSavedItems > 0)
+                lastItem = pawn.inventory.container[((backpack.numOfSavedItems > pawn.inventory.container.Count)?pawn.inventory.container.Count : backpack.numOfSavedItems) - 1];
+            if (foodInInventory != null && backpack.numOfSavedItems < pawn.inventory.container.Count)
+                lastItem = foodInInventory;
+            return lastItem;
+        }
+
+        public static List<Thing> Cart() { return Find.ListerThings.AllThings.FindAll((Thing thing) => (thing is Vehicle_Cart)); }
         public static bool AvailableCart(Vehicle_Cart cart, Pawn pawn)
         {
             return (!cart.TryGetComp<CompMountable>().IsMounted || cart.TryGetComp<CompMountable>().Driver == pawn);
@@ -49,43 +64,74 @@ namespace ToolsForHaul
         }
         public static Job HaulWithTools(Pawn pawn, Vehicle_Cart cart = null)
         {
-
             //Job Setting
             JobDef jobDef;
-            Apparel_Backpack backpack = ToolsForHaulUtility.TryGetBackpack(pawn);
+            TargetInfo targetC;
+            int maxItem;
+            int reservedMaxItem;
+            IEnumerable<Thing> remainingItems;
+            bool ShouldDrop = true;
+            Thing lastItem = ToolsForHaulUtility.TryGetBackpackLastItem(pawn);
             if (cart == null)
+            {
+                Apparel_Backpack backpack = ToolsForHaulUtility.TryGetBackpack(pawn);
                 jobDef = jobDefHaulWithBackpack;
-            else if (cart.TryGetComp<CompMountable>().IsMounted && cart.TryGetComp<CompMountable>().Driver.RaceProps.Animal)
-                jobDef = jobDefHaulWithAnimalCart;
+                targetC = backpack;
+                maxItem = backpack.maxItem;
+                reservedMaxItem = pawn.inventory.container.Count;
+                remainingItems = pawn.inventory.container;
+                if (lastItem != null)
+                    for (int i = 0; i < pawn.inventory.container.Count; i++)
+                        if (pawn.inventory.container[i] == lastItem && (reservedMaxItem - (i + 1)) <= 0)
+                        {
+                            ShouldDrop = false;
+                            break;
+                        }
+            }
             else
-                jobDef = jobDefHaulWithCart;
+            {
+                jobDef = (cart.TryGetComp<CompMountable>().IsMounted && cart.TryGetComp<CompMountable>().Driver.RaceProps.Animal)? 
+                    jobDefHaulWithAnimalCart : jobDefHaulWithCart;
+                targetC = cart;
+                maxItem = cart.MaxItem;
+                reservedMaxItem = cart.storage.Count;
+                remainingItems = cart.storage;
+            }
             Job job = new Job(jobDef);
             job.targetQueueA = new List<TargetInfo>();
             job.targetQueueB = new List<TargetInfo>();
-            job.targetC = (cart != null) ? (Thing)cart : (Thing)backpack;
+            job.targetC = targetC;
+
+            #if DEBUG
+            Log.Message(pawn.LabelCap + " In HaulWithTools: " + jobDef.defName + "\n"
+                + "MaxItem: " + maxItem + " reservedMaxItem: " + reservedMaxItem);
+            #endif
 
             //Drop remaining item
-            int numRemainingItems = (cart != null)? cart.storage.Count : pawn.inventory.container.Count;
-            if (numRemainingItems > 0)
+            if (reservedMaxItem >= Math.Ceiling(maxItem * 0.5) && ShouldDrop)
             {
-                IEnumerable<Thing> remainingItems = (cart != null) ? cart.storage : pawn.inventory.container;
-                foreach (Thing remainingItem in remainingItems)
+                bool startDrop = false;
+                for (int i = 0; i < remainingItems.Count(); i++)
                 {
-                    IntVec3 storageCell = FindStorageCell(pawn, remainingItem, job.targetQueueB);
-                    if (!storageCell.IsValid) break;
-
-                    ReservationUtility.Reserve(pawn, storageCell);
+                    if (startDrop == false)
+                        if (remainingItems.ElementAt(i) == lastItem) 
+                            startDrop = true;
+                        else
+                            continue;
+                    IntVec3 storageCell = FindStorageCell(pawn, remainingItems.ElementAt(i), job.targetQueueB);
+                    if (storageCell == IntVec3.Invalid) break;
                     job.targetQueueB.Add(storageCell);
                 }
                 if (!job.targetQueueB.NullOrEmpty())
                     return job;
                 JobFailReason.Is(ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
+                #if DEBUG
+                Log.Message("No Job. Reason: " + ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
+                #endif
                 return (Job)null;
             }
 
             //Collect and drop item
-            int reservedMaxItem = 0;
-            int maxItem = (cart != null) ? cart.MaxItem : (backpack != null) ? backpack.maxItem : 0;
             //List<Thing> deniedThings = new List<Thing>();
             while (reservedMaxItem < maxItem)
             {
@@ -126,10 +172,10 @@ namespace ToolsForHaul
             }
             if (!job.targetQueueA.NullOrEmpty() && !job.targetQueueB.NullOrEmpty())
                 return job;
-            if (job.targetQueueA.NullOrEmpty()) 
-                JobFailReason.Is(ToolsForHaulUtility.NoHaulable);
-            else
-                JobFailReason.Is(ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
+            JobFailReason.Is((job.targetQueueA.NullOrEmpty()) ? ToolsForHaulUtility.NoHaulable : ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
+            #if DEBUG
+            Log.Message("No Job. Reason: " + ((job.targetQueueA.NullOrEmpty()) ? ToolsForHaulUtility.NoHaulable : ToolsForHaulUtility.NoEmptyPlaceLowerTrans));
+            #endif
             return (Job)null;
         }
 
@@ -148,13 +194,14 @@ namespace ToolsForHaul
             if (StoreUtility.TryFindBestBetterStoreCellFor(closestHaulable, pawn, currentPriority, pawn.Faction, out foundCell, true))
                 return foundCell;
 
-            /*
+            //Vanila code is not worked item on container.
             foreach (var slotGroup in Find.SlotGroupManager.AllGroupsListInPriorityOrder)
+            {
                 foreach (var cell in slotGroup.CellsList.Where(cell =>
                             !targetQueue.Contains(cell) && StoreUtility.IsValidStorageFor(cell, closestHaulable) && pawn.CanReserve(cell)))
-                    if (cell != invalidCell && cell != IntVec3.Invalid)
+                    if (cell != IntVec3.Invalid)
                         return cell;
-            */
+            }
 
             return IntVec3.Invalid;
         }
@@ -163,12 +210,16 @@ namespace ToolsForHaul
         public static void DebugWriteHaulingPawn(Pawn pawn)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(pawn.LabelCap + " Report: Cart " + Cart().Count);
+            stringBuilder.AppendLine(pawn.LabelCap + " Report: Cart " + Cart().Count + " Job: " + ((pawn.CurJob != null)? pawn.CurJob.def.defName : "No Job")
+                + " Backpack: " + ((ToolsForHaulUtility.TryGetBackpack(pawn) != null) ? "True" : "False")
+                + " lastGivenWorkType: " + pawn.mindState.lastGivenWorkType);
             foreach (Pawn other in Find.ListerPawns.FreeColonistsSpawned)
             {
                 //Vanilla haul or Haul with backpack
                 if (other.CurJob != null && (other.CurJob.def == JobDefOf.HaulToCell || other.CurJob.def == jobDefHaulWithBackpack))
-                    stringBuilder.AppendLine(other.LabelCap + " Job: " + other.CurJob.def.defName + " lastGivenWorkType: " + other.mindState.lastGivenWorkType);
+                    stringBuilder.AppendLine(other.LabelCap + " Job: " + other.CurJob.def.defName
+                        + " Backpack: " + ((ToolsForHaulUtility.TryGetBackpack(other) != null) ? "True" : "False")
+                        + " lastGivenWorkType: " + other.mindState.lastGivenWorkType);
             }
             foreach (Vehicle_Cart cart in Cart())
             {

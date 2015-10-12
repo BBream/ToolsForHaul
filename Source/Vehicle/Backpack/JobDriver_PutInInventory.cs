@@ -96,7 +96,7 @@ namespace ToolsForHaul
                         {
                             CurJob.targetB.Thing.holder = pawn.inventory.GetContainer();
                             CurJob.targetB.Thing.holder.owner = pawn.inventory;
-                            backpack.numOfSavedItems++;
+                            backpack.numOfSavedItems = pawn.inventory.container.Count;
                         }
                     }
                     else

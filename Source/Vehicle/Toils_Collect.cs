@@ -189,7 +189,9 @@ public static class Toils_Collect
         return toil;
     }
 
-    //Toil Drop
+    /////////////
+    //Toil Drop//
+    /////////////
 
     public static Toil DropTheCarriedInCell(TargetIndex StoreCellInd, ThingPlaceMode placeMode)
     {
@@ -200,7 +202,8 @@ public static class Toils_Collect
             Job curJob = actor.jobs.curJob;
             if (actor.inventory.container.Count <= 0)
                 return;
-            Thing dropThing = actor.inventory.container.First();
+            toil.actor.jobs.curJob.SetTarget(TargetIndex.A, actor.inventory.container.First());
+            Thing dropThing = toil.actor.jobs.curJob.targetA.Thing;
             IntVec3 destLoc = actor.jobs.curJob.GetTarget(StoreCellInd).Cell;
             Thing dummy;
 
@@ -244,7 +247,10 @@ public static class Toils_Collect
                         dropThing = actor.inventory.container[i + 1];
             }
             else if (lastItem == null && actor.inventory.container.Count >= 1)
-                dropThing = actor.inventory.container.First();
+            {
+                toil.actor.jobs.curJob.SetTarget(TargetIndex.A, actor.inventory.container.First());
+                dropThing = toil.actor.jobs.curJob.targetA.Thing;
+            }
 
             if (dropThing == null)
             {
@@ -270,7 +276,8 @@ public static class Toils_Collect
             Vehicle_Cart carrier = actor.jobs.curJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
             if (carrier.storage.Count <= 0)
                 return;
-            Thing dropThing = carrier.storage.First(); 
+            toil.actor.jobs.curJob.SetTarget(TargetIndex.A, carrier.storage.First());
+            Thing dropThing = toil.actor.jobs.curJob.targetA.Thing;
             IntVec3 destLoc = actor.jobs.curJob.GetTarget(StoreCellInd).Cell;
             Thing dummy;
 
