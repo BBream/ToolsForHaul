@@ -106,7 +106,7 @@ namespace ToolsForHaul
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(HaulableInd, extractA);
             }
 
-            //JumpIf toilEnd
+            //JumpIf releaseAnimalCart
             yield return checkStoreCellEmpty;
 
             //Drop TargetQueue

@@ -18,7 +18,7 @@
   - Backpack's maximum stack is 50 per item. 
   - Bugs related to door are fixed.
   - Dismount Policy is changed: Home Area => Storage zone for cart or Cell near cart
-  - Now cart is not used if Hauling item is less than 50 persent of maximum item capacity.
+  - Now cart is not used if Hauling item is less than 50 persent of maximum item capacity(Typically less than 2 items).
   - Cart wheel is rotated if cart is moving.
   
   V1.5b
