@@ -12,9 +12,6 @@ namespace ToolsForHaul
 {
     public class WorkGiver_HaulWithCart : WorkGiver_Scanner
     {
-        private static string NoAvailableCart = Translator.Translate("NoAvailableCart");
-        private static string BurningLowerTrans = Translator.Translate("BurningLower");
-
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
             return ToolsForHaulUtility.Cart() as IEnumerable<Thing>;
@@ -25,8 +22,6 @@ namespace ToolsForHaul
             #if DEBUG
             ToolsForHaulUtility.DebugWriteHaulingPawn(pawn);
             #endif
-            if (ListerHaulables.ThingsPotentiallyNeedingHauling().Count == 0)
-                return true;
             if (ToolsForHaulUtility.Cart().Count == 0)
                 return true;
             return false;
@@ -41,12 +36,17 @@ namespace ToolsForHaul
                 return (Job)null;
             if (FireUtility.IsBurning(cart))
             {
-                JobFailReason.Is(WorkGiver_HaulWithCart.BurningLowerTrans);
+                JobFailReason.Is(ToolsForHaulUtility.BurningLowerTrans);
+                return (Job)null;
+            }
+            if (ListerHaulables.ThingsPotentiallyNeedingHauling().Count == 0 && cart.storage.Count == 0)
+            {
+                JobFailReason.Is(ToolsForHaulUtility.NoHaulable);
                 return (Job)null;
             }
             if (ToolsForHaulUtility.AvailableAnimalCart(cart) || ToolsForHaulUtility.AvailableCart(cart, pawn))
                 return ToolsForHaulUtility.HaulWithTools(pawn, cart);
-            JobFailReason.Is(WorkGiver_HaulWithCart.NoAvailableCart);
+            JobFailReason.Is(ToolsForHaulUtility.NoAvailableCart);
             return (Job)null;
         }
 

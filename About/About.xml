@@ -13,10 +13,19 @@
   - Saddle for rider
 		
   Change Log
+  V1.5c
+  - Now cart's maximum item become 4.
+  - Backpack's maximum stack is 50 per item. 
+  - Bugs related to door are fixed.
+  - Dismount Policy is changed: Home Area => Storage zone for cart or Cell near cart
+  - Now cart is not used if Hauling item is less than 50 persent of maximum item capacity.
+  - Cart wheel is rotated if cart is moving.
+  
   V1.5b
-  - Texture is changed.
-  - Bug is fixed.
-  - Code is refined.
+  - Texture is changed. Thanks for sharing it, mrofa!
+  - Critical Bug that make colonist idle is fixed.
+  - Backpack bug is fixed but need to check it is fine in a lot of case.
+  - Code is refined and separated from release mod. You can download code from github.
   
   V1.5a
   - 5 bugs are fixed. See this. https://github.com/BBream/ToolsForHaul/issues?q=is%3Aissue+is%3Aclosed

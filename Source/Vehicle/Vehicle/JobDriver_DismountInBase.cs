@@ -14,14 +14,14 @@ namespace ToolsForHaul
     public class JobDriver_DismountInBase : JobDriver
     {
         //Constants
-        private const TargetIndex CarrierInd = TargetIndex.A;
+        private const TargetIndex CartInd = TargetIndex.A;
         private const TargetIndex StoreCellInd = TargetIndex.B;
 
         public JobDriver_DismountInBase() : base() { }
 
         public override string GetReport()
         {
-            Vehicle_Cart vehicle = TargetThingA as Vehicle_Cart;
+            Vehicle_Cart cart = TargetThingA as Vehicle_Cart;
 
             IntVec3 destLoc = new IntVec3(-1000, -1000, -1000);
             string destName = null;
@@ -38,9 +38,9 @@ namespace ToolsForHaul
 
             string repString;
             if (destName != null)
-                repString = "ReportDismountingOn".Translate(vehicle.LabelCap, destName);
+                repString = "ReportDismountingOn".Translate(cart.LabelCap, destName);
             else
-                repString = "ReportDismounting".Translate(vehicle.LabelCap);
+                repString = "ReportDismounting".Translate(cart.LabelCap);
 
             return repString;
         }
@@ -51,42 +51,20 @@ namespace ToolsForHaul
             //Set fail conditions
             ///
 
-            this.FailOnDestroyed(CarrierInd);
+            this.FailOnDestroyed(CartInd);
             //Note we only fail on forbidden if the target doesn't start that way
             //This helps haul-aside jobs on forbidden items
             if (!TargetThingA.IsForbidden(pawn.Faction))
-                this.FailOnForbidden(CarrierInd);
+                this.FailOnForbidden(CartInd);
 
-            Vehicle_Cart carrier = TargetThingA as Vehicle_Cart;
+            Vehicle_Cart cart = TargetThingA as Vehicle_Cart;
 
 
             ///
             //Define Toil
             ///
 
-
-
-            Toil toilDismount = new Toil();
-            toilDismount.initAction = () => 
-            {
-                carrier.GetComp<CompMountable>().DismountAt(CurJob.targetB.Cell);
-                if (Find.Reservations.IsReserved(carrier, pawn.Faction))
-                    Find.Reservations.Release(carrier, pawn);
-            };
-
-
-            Toil toilMountOn = new Toil();
-            toilMountOn.initAction = () =>
-            {
-                carrier.GetComp<CompMountable>().MountOn(pawn);
-
-                //If unmounted, this job is failed
-                this.FailOn(() => { return (carrier.GetComp<CompMountable>().Driver != toilMountOn.actor) ? true : false; });
-            };
-
             Toil toilGoToCell = Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch);
-
-
 
             ///
             //Toils Start
@@ -94,20 +72,21 @@ namespace ToolsForHaul
 
 
             //Reserve thing to be stored and storage cell 
-            yield return Toils_Reserve.Reserve(CarrierInd);
+            yield return Toils_Reserve.Reserve(CartInd);
             yield return Toils_Reserve.Reserve(StoreCellInd);
 
             //JumpIf already mounted
-            yield return Toils_Jump.JumpIf(toilGoToCell, () => { return (carrier.GetComp<CompMountable>().Driver == pawn) ? true : false; });
+            yield return Toils_Jump.JumpIf(toilGoToCell, () => { return (cart.GetComp<CompMountable>().Driver == pawn) ? true : false; });
 
             //Mount on Target
-            yield return Toils_Goto.GotoThing(CarrierInd, PathEndMode.ClosestTouch)
-                                        .FailOnDespawned(CarrierInd);
-            yield return toilMountOn;
+            yield return Toils_Goto.GotoThing(CartInd, PathEndMode.ClosestTouch)
+                                        .FailOnDespawned(CartInd);
+            yield return Toils_Cart.MountOn(CartInd);
 
             //Dismount
             yield return toilGoToCell;
-            yield return toilDismount;
+
+            yield return Toils_Cart.DismountAt(CartInd, StoreCellInd);
         }
 
     }

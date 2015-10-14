@@ -85,7 +85,6 @@
     <Compile Include="Vehicle\Saddle\Designator_Board.cs" />
     <Compile Include="Vehicle\Saddle\Designator_Move.cs" />
     <Compile Include="Vehicle\Saddle\Vehicle_Saddle.cs" />
-    <Compile Include="Vehicle\WorkGiver_DismountInBase.cs" />
     <Compile Include="Backpack\WorkGiver_HaulWithBackpack.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

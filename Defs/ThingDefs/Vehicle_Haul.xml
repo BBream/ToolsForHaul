@@ -20,6 +20,7 @@
       <Flammability>1.0</Flammability>
     </statBases>
     <alwaysHaulable>false</alwaysHaulable>
+    <!-- <designateHaulable>false</designateHaulable> -->
     <comps>
       <li>
         <compClass>CompForbiddable</compClass>

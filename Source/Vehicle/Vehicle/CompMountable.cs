@@ -20,6 +20,9 @@ namespace ToolsForHaul
         private const string txtDismount = "Dismount";
 
         protected Pawn driver = null;
+        private Building_Door lastPassedDoor = null;
+        private int tickLastDoorCheck = Find.TickManager.TicksGame;
+        private const int TickCooldownDoorCheck = 96;
 
         public void MountOn(Pawn pawn) 
         { 
@@ -49,9 +52,11 @@ namespace ToolsForHaul
             get {
                 Vector3 mapSize = Find.Map.Size.ToVector3();
                 Vector3 position = driver.DrawPos - InteractionOffset;
+                //No driver
                 if (driver == null)
                     return parent.DrawPos;
-                else if (!GenGrid.InBounds(position)) // Out of bound
+                //Out of bound or Preventing cart from stucking door
+                else if (!GenGrid.InBounds(position))
                     return driver.DrawPos;
                 else
                     return (driver.DrawPos - InteractionOffset);
@@ -61,6 +66,7 @@ namespace ToolsForHaul
         {
             base.PostExposeData();
             Scribe_References.LookReference<Pawn>(ref driver, "driver");
+            Scribe_References.LookReference<Building_Door>(ref lastPassedDoor, "lastPassedDoor");
         }
 
         public override void CompTick()
@@ -74,6 +80,19 @@ namespace ToolsForHaul
                     Dismount();
                 else
                 {
+                    if (Find.TickManager.TicksGame - tickLastDoorCheck >= TickCooldownDoorCheck
+                    && (driver.Position.GetEdifice() is Building_Door || parent.Position.GetEdifice() is Building_Door))
+                    {
+                        lastPassedDoor = ((driver.Position.GetEdifice() is Building_Door) ?
+                            driver.Position.GetEdifice() : parent.Position.GetEdifice()) as Building_Door;
+                        lastPassedDoor.StartManualOpenBy(driver);
+                        tickLastDoorCheck = Find.TickManager.TicksGame;
+                    }
+                    else if (Find.TickManager.TicksGame - tickLastDoorCheck >= TickCooldownDoorCheck && lastPassedDoor != null)
+                    {
+                        lastPassedDoor.StartManualCloseBy(driver);
+                        lastPassedDoor = null;
+                    }
                     parent.Position = IntVec3Utility.ToIntVec3(Position);
                     parent.Rotation = driver.Rotation;
                 }

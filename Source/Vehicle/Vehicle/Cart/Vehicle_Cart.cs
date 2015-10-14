@@ -15,7 +15,8 @@ namespace ToolsForHaul
 
         #region Variables
         // ==================================
-        private const int maxItemPerBodySize = 4;
+        private const int MaxItemPerBodySize = 4;
+        private const int DefaultMaxItem = 4;
 
         //Graphic data
         private Graphic_Multi graphic_Handle;
@@ -25,6 +26,7 @@ namespace ToolsForHaul
         private Vector3 handleLoc;
         private Vector3 wheelLoc;
         private Vector3 bodyLoc;
+        private int wheelRotation;
 
         //mount and storage data
         public CompMountable mountableComp;
@@ -40,13 +42,10 @@ namespace ToolsForHaul
             get 
             { 
                 return (mountableComp.IsMounted && mountableComp.Driver.RaceProps.Animal)? 
-                    Mathf.CeilToInt(mountableComp.Driver.BodySize * maxItemPerBodySize) : 3; 
+                    Mathf.CeilToInt(mountableComp.Driver.BodySize * MaxItemPerBodySize) : DefaultMaxItem; 
             } 
         }
         public int GetMaxStackCount { get { return MaxItem * 100; } }
-
-        int tickTime = 0;
-
 
         #endregion
 
@@ -54,6 +53,8 @@ namespace ToolsForHaul
 
         public Vehicle_Cart():base()
         {
+            wheelRotation = 0;
+
             //Inventory Initialize. It should be moved in constructor
             this.storage = new ThingContainer(this);
             this.allowances = new ThingFilter();
@@ -133,7 +134,8 @@ namespace ToolsForHaul
         public override void Tick()
         {
             base.Tick();
-            tickTime += 1;    
+            if (mountableComp.IsMounted && mountableComp.Driver.pather.Moving && !mountableComp.Driver.stances.FullBodyBusy)
+                wheelRotation++;
         }
 
         #endregion
@@ -183,17 +185,32 @@ namespace ToolsForHaul
             wheelLoc = drawLoc; wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.04f;
             bodyLoc = drawLoc; bodyLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.03f;
 
-            if (mountableComp.IsMounted && mountableComp.Driver.pather.Moving)
+            //Vertical
+            if (this.Rotation.AsInt % 2 == 0)
             {
-                float wheel_shake = (float)((Math.Sin(tickTime / 10) + Math.Abs(Math.Sin(tickTime / 10))) / 40.0);
-                wheelLoc.z = wheelLoc.z + wheel_shake;
+                wheelLoc.z += 0.025f * Mathf.Sin((wheelRotation * 0.10f) % (2 * Mathf.PI));
+                wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.02f;
             }
 
-            if (this.Rotation.AsInt % 2 == 0) //Vertical
-                wheelLoc.y = Altitudes.AltitudeFor(AltitudeLayer.Pawn) + 0.02f;
-
             base.DrawAt(bodyLoc);
-            graphic_Wheel.Draw(wheelLoc, this.Rotation, this);
+            //Wheels
+            //Horizen
+            if (this.Rotation.AsInt % 2 == 1)
+            {
+                Vector2 drawSize = this.def.graphic.drawSize;
+                int flip = (this.Rotation == Rot4.West) ? -1 : 1;
+                Vector3 scale = new Vector3(1f * drawSize.x, 1f, 1f * drawSize.y);
+                Matrix4x4 matrix = new Matrix4x4();
+                Vector3 offset = new Vector3(-20f / 192f * drawSize.x * flip, 0, -24f / 192f * drawSize.y);
+                Quaternion quat = this.Rotation.AsQuat;
+                float x = 1f * Mathf.Sin((flip * wheelRotation * 0.05f) % (2 * Mathf.PI));
+                float y = 1f * Mathf.Cos((flip * wheelRotation * 0.05f) % (2 * Mathf.PI));
+                quat.SetLookRotation(new Vector3(x, 0, y), Vector3.up);
+                matrix.SetTRS(wheelLoc + offset, quat, scale);
+                Graphics.DrawMesh(MeshPool.plane10, matrix, graphic_Wheel.MatAt(this.Rotation), 0);
+            }
+            else
+                graphic_Wheel.Draw(wheelLoc, this.Rotation, this);
             graphic_Handle.Draw(handleLoc, this.Rotation, this);
         }
 

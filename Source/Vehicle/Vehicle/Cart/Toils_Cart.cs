@@ -48,6 +48,12 @@ namespace ToolsForHaul
 
         public static Toil FindStoreCellForCart(TargetIndex CartInd)
         {
+            const int NearbyCell = 8;
+            const int RegionCellOffset = 16;
+            IntVec3 invalid = new IntVec3(0, 0, 0);
+            #if DEBUG
+            StringBuilder stringBuilder = new StringBuilder();
+            #endif
             Toil toil = new Toil();
             toil.initAction = () =>
             {
@@ -59,13 +65,82 @@ namespace ToolsForHaul
                     Log.Error(actor.LabelCap + " Report: Cart is invalid.");
                     toil.actor.jobs.curDriver.EndJobWith(JobCondition.Errored);
                 }
-                if (!Find.AreaHome.ActiveCells.Contains(cart.Position) || cart.Position.GetZone() != null)
-                    foreach (IntVec3 cell in Find.AreaHome.ActiveCells.Where(cell => cell.GetZone() == null && cell.Standable()))
+                //Find Valid Storage
+                foreach (IntVec3 cell in GenRadial.RadialCellsAround(cart.Position, NearbyCell, false))
+                {
+                    if (cell.IsValidStorageFor(cart) 
+                        && ReservationUtility.CanReserveAndReach(actor, cell, PathEndMode.ClosestTouch, DangerUtility.NormalMaxDanger(actor)))
                     {
-                        if ((cart.Position - cell).LengthHorizontalSquared < (cart.Position - storeCell).LengthHorizontalSquared)
-                            storeCell = cell;
+                        storeCell = cell;
+                        #if DEBUG
+                        stringBuilder.AppendLine("Found cell: " + storeCell);
+                        #endif
                     }
-                toil.actor.jobs.curJob.targetB = (storeCell != IntVec3.Invalid)? storeCell : cart.Position;
+                }
+
+                if (storeCell == IntVec3.Invalid)
+                {
+                    //Regionwise Flood-fill cellFinder
+                    int regionInd = 0;
+                    List<Region> regions = new List<Region>();
+                    regions.Add(cart.Position.GetRegion());
+                    #if DEBUG
+                    stringBuilder.AppendLine(actor.LabelCap + " Report");
+                    #endif
+                    bool flag1 = false;
+                    while (regionInd < regions.Count)
+                    {
+                        #if DEBUG
+                        stringBuilder.AppendLine("Region id: " + regions[regionInd].id);
+                        #endif
+                        if (regions[regionInd].extentsClose.Center.InHorDistOf(cart.Position, NearbyCell + RegionCellOffset))
+                        {
+                            IntVec3 foundCell = IntVec3.Invalid;
+                            float distFoundCell = float.MaxValue;
+                            foreach (IntVec3 cell in regions[regionInd].Cells)
+                            {
+                                //Find best cell for placing cart
+                                if (cell.GetEdifice() == null && cell.GetZone() == null && cell.Standable()
+                                && !GenAdj.CellsAdjacentCardinal(cell, Rot4.North, IntVec2.One).Any(cardinal => cardinal.GetEdifice() is Building_Door)
+                                && ReservationUtility.CanReserveAndReach(actor, cell, PathEndMode.ClosestTouch, DangerUtility.NormalMaxDanger(actor)))
+                                {
+                                    if (regions[(regionInd > 0)? regionInd - 1: 0].extentsClose.Center.DistanceToSquared(cell) < distFoundCell)
+                                    {
+                                        foundCell = cell;
+                                        distFoundCell = regions[(regionInd > 0) ? regionInd - 1 : 0].extentsClose.Center.DistanceToSquared(cell);
+                                        flag1 = true;
+                                    }
+                                }
+                            }
+                            if (flag1 == true)
+                            {
+                                storeCell = foundCell;
+                                #if DEBUG
+                                stringBuilder.AppendLine("Found cell: " + storeCell);
+                                #endif
+                                break;
+                            }
+                            foreach (RegionLink link in regions[regionInd].links)
+                            {
+                                if (regions.Contains(link.RegionA) == false)
+                                    regions.Add(link.RegionA);
+                                if (regions.Contains(link.RegionB) == false)
+                                    regions.Add(link.RegionB);
+                            }
+                        }
+                        regionInd++;
+                    }
+                }
+                //Log.Message(stringBuilder.ToString());
+                /*
+                //Home Area
+                if (storeCell == IntVec3.Invalid)
+                    foreach (IntVec3 cell in Find.AreaHome.ActiveCells.Where(cell => (cell.GetZone() == null || cell.IsValidStorageFor(cart)) && cell.Standable() && cell.GetEdifice() == null))
+                        if (cell.DistanceToSquared(cart.Position) < NearbyCell)
+                            storeCell = cell;
+                */
+                ReservationUtility.Reserve(actor, storeCell);
+                toil.actor.jobs.curJob.targetB = (storeCell != invalid && storeCell != IntVec3.Invalid) ? storeCell : cart.Position;
             };
             return toil;
         }

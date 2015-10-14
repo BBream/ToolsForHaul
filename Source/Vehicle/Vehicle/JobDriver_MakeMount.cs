@@ -82,20 +82,26 @@ namespace ToolsForHaul
                 if (driver != null && TargetThingA.TryGetComp<CompMountable>() != null)
                     TargetThingA.TryGetComp<CompMountable>().MountOn(driver);
                 else
-                    Log.Error(GetActor().LabelCap + ": Try make mount without target B");
+                {
+                    Log.Error(GetActor().LabelCap + ": Try make mount without target B Driver");
+                    EndJobWith(JobCondition.Errored);
+                }
             };
 
             Toil toilEnd = new Toil();
             toilEnd.initAction = () =>
             {
                 Vehicle_Cart cart = CurJob.GetTarget(MountableInd).Thing as Vehicle_Cart;
-                if (cart == null)
+                Vehicle_Saddle saddle = CurJob.GetTarget(MountableInd).Thing as Vehicle_Saddle;
+                if (cart == null || saddle == null)
                 {
-                    Log.Error(GetActor().LabelCap + ": MakeMount get TargetA not cart.");
+                    Log.Error(GetActor().LabelCap + ": MakeMount get TargetA not cart or saddle.");
+                    EndJobWith(JobCondition.Errored);
                     return;
                 }
                 if (cart.mountableComp.IsMounted && cart.mountableComp.Driver.CurJob.def == DefDatabase<JobDef>.GetNamed("Standby"))
                     cart.mountableComp.Driver.jobs.curDriver.EndJobWith(JobCondition.Succeeded);
+                EndJobWith(JobCondition.Succeeded);
             };
 
             ///

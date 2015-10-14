@@ -7,8 +7,8 @@
     <giverClass>ToolsForHaul.WorkGiver_HaulWithBackpack</giverClass>
     <workType>Hauling</workType>
     <priorityInType>9</priorityInType>
-    <verb>haul with backpack</verb>
-    <gerund>hauling with backpack</gerund>
+    <verb>haul with </verb>
+    <gerund>hauling with </gerund>
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
@@ -22,8 +22,8 @@
     <workType>Hauling</workType>
     <priorityInType>7</priorityInType>
     <scanThings>true</scanThings>
-    <verb>haul with cart</verb>
-    <gerund>hauling with cart</gerund>
+    <verb>haul with </verb>
+    <gerund>hauling with </gerund>
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
@@ -41,7 +41,7 @@
     </requiredCapacities>
   </WorkGiverDef> -->
   
-  <WorkGiverDef>
+  <!-- <WorkGiverDef>
     <defName>DismountInBase</defName>
     <giverClass>ToolsForHaul.WorkGiver_DismountInBase</giverClass>
     <workType>Hauling</workType>
@@ -52,7 +52,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
-  </WorkGiverDef>
+  </WorkGiverDef> -->
 
 
 </WorkGivers>

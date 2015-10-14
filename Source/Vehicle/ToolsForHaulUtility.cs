@@ -1,10 +1,11 @@
-﻿#define DEBUG
+﻿//#define DEBUG
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using UnityEngine;
 using RimWorld;
 using Verse;
 using Verse.AI;
@@ -15,15 +16,20 @@ namespace ToolsForHaul
     {
         public static string NoHaulable;
         public static string NoEmptyPlaceLowerTrans;
+        public static string NoAvailableCart;
+        public static string BurningLowerTrans;
         private static readonly JobDef jobDefHaulWithBackpack = DefDatabase<JobDef>.GetNamed("HaulWithBackpack");
         private static readonly JobDef jobDefHaulWithAnimalCart = DefDatabase<JobDef>.GetNamed("HaulWithAnimalCart");
         private static readonly JobDef jobDefHaulWithCart = DefDatabase<JobDef>.GetNamed("HaulWithCart");
+        private static readonly JobDef jobDefDismountInBase = DefDatabase<JobDef>.GetNamed("DismountInBase");
         private const int NearbyCell = 10;
 
         static ToolsForHaulUtility()
         {
             ToolsForHaulUtility.NoHaulable = Translator.Translate("NoHaulable");
             ToolsForHaulUtility.NoEmptyPlaceLowerTrans = Translator.Translate("NoEmptyPlaceLower");
+            ToolsForHaulUtility.NoAvailableCart = Translator.Translate("NoAvailableCart");
+            ToolsForHaulUtility.BurningLowerTrans = Translator.Translate("BurningLower");
         }
         public static Apparel_Backpack TryGetBackpack(Pawn pawn)
         {
@@ -124,6 +130,8 @@ namespace ToolsForHaul
                 }
                 if (!job.targetQueueB.NullOrEmpty())
                     return job;
+                if (cart != null && job.def == jobDefHaulWithCart && !cart.IsInValidStorage())
+                    return DismountInBase(pawn, cart);
                 JobFailReason.Is(ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
                 #if DEBUG
                 Log.Message("No Job. Reason: " + ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
@@ -131,26 +139,32 @@ namespace ToolsForHaul
                 return (Job)null;
             }
 
+            //ClosestThing_Global_Reachable Configuration
+            Predicate<Thing> predicate = item
+                    => !job.targetQueueA.Contains(item) && !FireUtility.IsBurning(item) //&& !deniedThings.Contains(item)
+                        && (cart != null && cart.allowances.Allows(item))
+                        && pawn.CanReserveAndReach(item, PathEndMode.Touch, DangerUtility.NormalMaxDanger(pawn));
+            IntVec3 searchPos = (cart != null) ? cart.Position : pawn.Position;
+            int maxDistance = 99999;
+            bool flag1 = false;
             //Collect and drop item
-            //List<Thing> deniedThings = new List<Thing>();
             while (reservedMaxItem < maxItem)
             {
-                //ClosestThing_Global_Reachable Configuration
-                Predicate<Thing> predicate = item
-                    => !job.targetQueueA.Contains(item) && !FireUtility.IsBurning(item) //&& !deniedThings.Contains(item)
-                    && pawn.CanReserveAndReach(item, PathEndMode.Touch, DangerUtility.NormalMaxDanger(pawn));
-                IntVec3 searchPos = (!job.targetQueueA.NullOrEmpty() && job.targetQueueA.First().Thing.Position != IntVec3.Invalid) ?
-                    job.targetQueueA.First().Thing.Position : (cart != null) ? cart.Position : pawn.Position;
-                int maxDistance = (!job.targetQueueA.NullOrEmpty() && job.targetQueueA.First().Thing.Position != IntVec3.Invalid) ?
-                    NearbyCell : 99999;
+                if (flag1 == false && !job.targetQueueA.NullOrEmpty() && job.targetQueueA.First().Thing.Position != IntVec3.Invalid)
+                {
+                    flag1 = true;
+                    searchPos = job.targetQueueA.First().Thing.Position;
+                    maxDistance = NearbyCell;
+                }
 
                 //Find Haulable
                 Thing closestHaulable = GenClosest.ClosestThing_Global_Reachable(searchPos,
-                                                                            ListerHaulables.ThingsPotentiallyNeedingHauling(),
-                                                                            PathEndMode.Touch,
-                                                                            TraverseParms.For(pawn, Danger.Some),
-                                                                            maxDistance,
-                                                                            predicate);
+                                                                                ListerHaulables.ThingsPotentiallyNeedingHauling(),
+                                                                                PathEndMode.Touch,
+                                                                                TraverseParms.For(pawn, Danger.Some),
+                                                                                maxDistance,
+                                                                                predicate);
+
                 //Check it can be hauled
                 /*
                 if ((closestHaulable is UnfinishedThing && ((UnfinishedThing)closestHaulable).BoundBill != null)
@@ -170,8 +184,11 @@ namespace ToolsForHaul
                 job.targetQueueB.Add(storageCell);
                 reservedMaxItem++;
             }
-            if (!job.targetQueueA.NullOrEmpty() && !job.targetQueueB.NullOrEmpty())
+            if (!job.targetQueueA.NullOrEmpty() && job.targetQueueA.Count > (int)Math.Ceiling(maxItem * 0.5) 
+                && !job.targetQueueB.NullOrEmpty())
                 return job;
+            if (cart != null && job.def == jobDefHaulWithCart && !cart.IsInValidStorage())
+                return DismountInBase(pawn, cart);
             JobFailReason.Is((job.targetQueueA.NullOrEmpty()) ? ToolsForHaulUtility.NoHaulable : ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
             #if DEBUG
             Log.Message("No Job. Reason: " + ((job.targetQueueA.NullOrEmpty()) ? ToolsForHaulUtility.NoHaulable : ToolsForHaulUtility.NoEmptyPlaceLowerTrans));
@@ -179,13 +196,22 @@ namespace ToolsForHaul
             return (Job)null;
         }
 
+        public static Job DismountInBase(Pawn pawn, Vehicle_Cart cart)
+        {
+            Job job = new Job(jobDefDismountInBase);
+            job.targetA = cart;
+            job.targetB = FindStorageCell(pawn, cart);
+            if (job.targetB != IntVec3.Invalid)
+                return job;
+            return (Job)null;
+        }
 
-        private static IntVec3 FindStorageCell(Pawn pawn, Thing closestHaulable, List<TargetInfo> targetQueue)
+        private static IntVec3 FindStorageCell(Pawn pawn, Thing closestHaulable, List<TargetInfo> targetQueue = null)
         {
             //Find closest cell in queue.
             if (!targetQueue.NullOrEmpty())
                 foreach (TargetInfo target in targetQueue)
-                    foreach (var adjCell in GenAdjFast.AdjacentCells8Way(target))
+                    foreach (IntVec3 adjCell in GenAdjFast.AdjacentCells8Way(target))
                         if (!targetQueue.Contains(adjCell) && adjCell.IsValidStorageFor(closestHaulable) && pawn.CanReserve(adjCell))
                             return adjCell;
             
@@ -195,10 +221,10 @@ namespace ToolsForHaul
                 return foundCell;
 
             //Vanila code is not worked item on container.
-            foreach (var slotGroup in Find.SlotGroupManager.AllGroupsListInPriorityOrder)
+            foreach (SlotGroup slotGroup in Find.SlotGroupManager.AllGroupsListInPriorityOrder)
             {
-                foreach (var cell in slotGroup.CellsList.Where(cell =>
-                            !targetQueue.Contains(cell) && StoreUtility.IsValidStorageFor(cell, closestHaulable) && pawn.CanReserve(cell)))
+                foreach (IntVec3 cell in slotGroup.CellsList.Where(cell =>
+                            ((!targetQueue.NullOrEmpty() && !targetQueue.Contains(cell)) || targetQueue.NullOrEmpty()) && cell.IsValidStorageFor(closestHaulable) && pawn.CanReserve(cell)))
                     if (cell != IntVec3.Invalid)
                         return cell;
             }
