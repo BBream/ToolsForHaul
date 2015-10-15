@@ -107,8 +107,8 @@ namespace ToolsForHaul
                 Find.Reservations.ReleaseAllForTarget(this);
                 Find.Reservations.Reserve(myPawn, this);
                 Find.DesignationManager.AddDesignation(new Designation(this, DesignationDefOf.Deconstruct));
-                Job jobNew = new Job(JobDefOf.Deconstruct, this);
-                myPawn.drafter.TakeOrderedJob(jobNew);
+                Job job = new Job(JobDefOf.Deconstruct, this);
+                myPawn.jobs.StartJob(job, JobCondition.InterruptForced);
             };
 
             yield return new FloatMenuOption("Deconstruct".Translate(this.LabelBase), action_Order);

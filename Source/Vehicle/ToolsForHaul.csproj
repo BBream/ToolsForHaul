@@ -86,6 +86,23 @@
     <Compile Include="Vehicle\Saddle\Designator_Move.cs" />
     <Compile Include="Vehicle\Saddle\Vehicle_Saddle.cs" />
     <Compile Include="Backpack\WorkGiver_HaulWithBackpack.cs" />
+    <Compile Include="Vehicle\Scooter\CompEngine.cs" />
+    <Compile Include="Vehicle\Scooter\Designator_Board.cs" />
+    <Compile Include="Vehicle\Scooter\Designator_Claim.cs" />
+    <Compile Include="Vehicle\Scooter\Designator_ForcedTarget.cs" />
+    <Compile Include="Vehicle\Scooter\Designator_Mount.cs" />
+    <Compile Include="Vehicle\Scooter\Designator_Move.cs" />
+    <Compile Include="Vehicle\Scooter\JobDriver_Board.cs" />
+    <Compile Include="Vehicle\Scooter\JobDriver_ClaimVehicle.cs" />
+    <Compile Include="Vehicle\Scooter\JobDriver_DismountOnCell.cs" />
+    <Compile Include="Vehicle\Scooter\JobDriver_Mount.cs" />
+    <Compile Include="Vehicle\Scooter\Parts_Turret.cs" />
+    <Compile Include="Vehicle\Scooter\Parts_TurretGun.cs" />
+    <Compile Include="Vehicle\Scooter\TurretTop.cs" />
+    <Compile Include="Vehicle\Scooter\VehicleDef.cs" />
+    <Compile Include="Vehicle\Scooter\Vehicle.cs" />
+    <Compile Include="Vehicle\Scooter\Vehicle_CrewsTracker.cs" />
+    <Compile Include="Vehicle\Scooter\Vehicle_DriverTracker.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

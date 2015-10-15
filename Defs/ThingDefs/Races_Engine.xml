@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ThingDefs>
+
+  <ThingDef Name="BaseEngine" Abstract="True">
+    <thingClass>Pawn</thingClass>
+    <category>Pawn</category>
+    <selectable>false</selectable>
+    <tickerType>Normal</tickerType>
+    <altitudeLayer>Floor</altitudeLayer>
+    <useHitPoints>false</useHitPoints>
+    <hasTooltip>true</hasTooltip>
+    <soundImpactDefault>BulletImpactFlesh</soundImpactDefault>
+    <inspectorTabs>
+      <li>ITab_Pawn_Health</li>
+      <li>ITab_Pawn_Needs</li>
+      <li>ITab_Pawn_Character</li>
+      <li>ITab_Pawn_Training</li>
+      <li>ITab_Pawn_Gear</li>
+      <li>ITab_Pawn_Guest</li>
+      <li>ITab_Pawn_Prisoner</li>
+    </inspectorTabs>
+    <comps>
+      <li>
+        <compClass>CompAttachBase</compClass>
+      </li>
+    </comps>
+    <drawGUIOverlay>false</drawGUIOverlay>
+  </ThingDef>
+  
+  
+  <!-- ============================ Vehicle ========================== -->
+
+  <ThingDef ParentName="BaseEngine" Name="BaseVehicle" Abstract="true">
+    <drawerType>None</drawerType>
+    <soundImpactDefault>BulletImpactMetal</soundImpactDefault>
+    <statBases>
+      <Flammability>0.5</Flammability>
+      <ComfyTemperatureMin>-100</ComfyTemperatureMin>
+      <ComfyTemperatureMax>250</ComfyTemperatureMax>
+    </statBases>
+    <race>
+      <mechanoid>false</mechanoid>
+      <needsRest>false</needsRest>
+      <hasGenders>false</hasGenders>
+      <isFlesh>false</isFlesh>
+      <diet>NeverEats</diet>
+    </race>
+    <leaveResourcesWhenKilled>true</leaveResourcesWhenKilled>
+    <passability>PassThroughOnly</passability>
+    <coversFloor>true</coversFloor>
+    <inspectorTabs>
+      <!-- <li>Vehicle.ITab_Pawn_VehicleGear</li> -->
+    </inspectorTabs>
+  </ThingDef>
+  
+  <ThingDef>
+    <defName>Parts</defName>
+    <category>Ethereal</category>
+    <label>Parts</label>
+    <thingClass>Thing</thingClass>
+    <drawerType>None</drawerType>
+    <tickerType>Normal</tickerType>
+    <useHitPoints>false</useHitPoints>
+    <selectable>false</selectable>
+  </ThingDef>
+  
+  <ThingDef ParentName="BaseVehicle">
+    <defName>ScooterEngine</defName>
+    <label>ScooterEngine</label>
+    <description>Scooter Engine</description>
+    <graphicData>
+      <texPath>Things/Pawn/Vehicle/SmallTruck</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <statBases>
+      <MoveSpeed>10.0</MoveSpeed>
+    </statBases>
+    <verbs>
+    </verbs>
+    <race>
+      <thinkTree>Engine</thinkTree>
+      <body>Engine</body>
+      <baseBodySize>0.5</baseBodySize>
+      <baseHealthScale>1.0</baseHealthScale>
+      <lifeStageAges>
+        <li>
+          <def>MechanoidFullyFormed</def>
+          <minAge>0</minAge>
+        </li>
+      </lifeStageAges>
+      <soundMeleeHitPawn>Pawn_Melee_MechanoidBash_HitPawn</soundMeleeHitPawn>
+      <soundMeleeHitBuilding>Pawn_Melee_MechanoidBash_HitBuilding</soundMeleeHitBuilding>
+      <soundMeleeMiss>Pawn_Melee_MechanoidBash_Miss</soundMeleeMiss>
+    </race>
+    <size>(1,1)</size>
+  </ThingDef>
+
+</ThingDefs>

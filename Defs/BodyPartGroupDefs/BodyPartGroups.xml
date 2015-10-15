@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<BodyPartGroupDefs>
+
+  <BodyPartGroupDef>
+    <defName>EngineBody</defName>
+    <label>engine body</label>
+    <listOrder>200</listOrder>
+  </BodyPartGroupDef>
+
+</BodyPartGroupDefs>

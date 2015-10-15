@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ThingDefs>
+
+  <ThingDef Name="BaseThingWithComponents" Abstract="True">
+    <thingClass>ThingWithComponents</thingClass>
+    <category>Item</category>
+    <selectable>true</selectable>
+    <tickerType>Normal</tickerType>
+    <altitudeLayer>Waist</altitudeLayer>
+		<useHitPoints>True</useHitPoints>
+    <hasTooltip>true</hasTooltip>
+    <soundImpactDefault>BulletImpactMetal</soundImpactDefault>
+  </ThingDef>
+  
+  
+  <!-- ============================ Vehicle ========================== -->
+
+  <ThingDef ParentName="BaseThingWithComponents" Name="BaseVehicle" Abstract="True">
+    <statBases>
+      <Flammability>1.0</Flammability>
+    </statBases>
+    <alwaysHaulable>false</alwaysHaulable>
+    <!-- <designateHaulable>false</designateHaulable> -->
+    <comps>
+      <li>
+        <compClass>CompForbiddable</compClass>
+      </li>
+      <li>
+        <compClass>Vehicle.CompEngine</compClass>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <ThingDef>
+    <defName>Parts</defName>
+    <category>Ethereal</category>
+    <label>Parts</label>
+    <thingClass>Thing</thingClass>
+    <drawerType>None</drawerType>
+    <tickerType>Normal</tickerType>
+    <useHitPoints>false</useHitPoints>
+    <selectable>false</selectable>
+  </ThingDef>
+ 
+  <!-- SmallTruck -->
+  
+  <ThingDef ParentName="BaseVehicle" Class="Vehicle.VehicleDef">
+    <defName>Scooter</defName>
+    <label>Scooter</label>
+    <passability>PassThroughOnly</passability>
+    <altitudeLayer>Waist</altitudeLayer>
+    <description>Scooter</description>
+    <thingClass>Vehicle.Vehicle</thingClass>
+    <thingCategories>
+      <li>Vehicles</li>
+    </thingCategories>
+    <graphicData>
+      <texPath>Things/Pawn/Vehicle/SmallTruck</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(2,2)</drawSize>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>300</MaxHitPoints>
+    </statBases>
+    <size>(1,1)</size>
+    <CostList>
+      <Steel>80</Steel>
+    </CostList>
+    <leaveResourcesWhenKilled>true</leaveResourcesWhenKilled>
+    <killedLeavings>
+      <Steel>40</Steel>
+    </killedLeavings>
+    <recipeMaker>
+      <workSpeedStat>SmithingSpeed</workSpeedStat>
+      <workSkill>Crafting</workSkill>
+      <effectWorking>Smith</effectWorking>
+      <soundWorking>Recipe_Smithing</soundWorking>
+      <recipeUsers>
+        <li>TableSmithing</li>
+      </recipeUsers>
+      <workAmount>2400</workAmount>
+    <unfinishedThingDef>UnfinishedCart</unfinishedThingDef>
+	  <skillRequirements>
+		<!-- <li>
+		  <skill>Crafting</skill>
+		  <minLevel>8</minLevel>
+		</li> -->
+	  </skillRequirements>
+    </recipeMaker>
+    <vehicle>
+      <mountPosOffset>(0, 0, 0)</mountPosOffset>
+      <mountedPart>EngineBody</mountedPart>
+      <maxNumOfBoarding>0</maxNumOfBoarding>
+      <driverOffset>(0.0, 0, 0.0)</driverOffset>
+      <driverVisible>Always</driverVisible>
+      <extraGraphicDefs>
+      </extraGraphicDefs>
+    </vehicle>
+  </ThingDef>
+  
+</ThingDefs>

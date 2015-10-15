@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<JobDefs>
+
+  <!--============= Item hauling ===============-->
+
+  <JobDef>
+    <defName>DismountOnCell</defName>
+    <driverClass>Vehicle.JobDriver_DismountOnCell</driverClass>
+    <reportString>Dismount TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>Mount</defName>
+    <driverClass>Vehicle.JobDriver_Mount</driverClass>
+    <reportString>Mount on TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>Board</defName>
+    <driverClass>Vehicle.JobDriver_Board</driverClass>
+    <reportString>Board on TargetA.</reportString>
+  </JobDef>
+  
+  <JobDef>
+    <defName>ClaimVehicle</defName>
+    <driverClass>Vehicle.JobDriver_ClaimVehicle</driverClass>
+    <reportString>Claiming TargetA.</reportString>
+  </JobDef>
+  
+</JobDefs>

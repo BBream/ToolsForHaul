@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<PawnKindDefs>
+  
+  <PawnKindDef>
+		<defName>ScooterEngine</defName>
+    <label>scooter engine</label>
+    <race>ScooterEngine</race>
+    <combatPower>1</combatPower>
+    <lifeStages>
+      <li>
+        <bodyGraphicData>
+          <texPath>Things/Pawn/Vehicle/SmallTruck</texPath>
+          <graphicClass>Graphic_Multi</graphicClass>
+          <drawSize>1</drawSize>
+          <shadowData>
+            <volume>(0.6, 0.8, 0.6)</volume>
+          </shadowData>
+        </bodyGraphicData>
+      </li>
+    </lifeStages>
+  </PawnKindDef>
+ 
+  
+  
+</PawnKindDefs>

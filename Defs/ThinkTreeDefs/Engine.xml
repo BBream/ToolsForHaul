@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ThinkTrees>
+
+	<ThinkTreeDef>
+		<defName>Engine</defName>
+		<thinkRoot Class="ThinkNode_Priority">
+      <subNodes>        
+        <li Class="JobGiver_IdleForever"/>
+      </subNodes>
+		</thinkRoot>
+	</ThinkTreeDef>
+
+
+
+</ThinkTrees>

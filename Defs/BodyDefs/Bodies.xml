@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+	Each coverage value is relative to its parent.
+	Remaining body part coverage (100% minus coverage of all child nodes) is a chance to hit exactly this part.
+	Damage "starts" at corePart, and then "goes deeper" until it hits remaining body part coverage or leaf node - this body part is then hit.
+-->
+
+<BodyDefs>
+
+	<BodyDef>
+		<defName>Engine</defName>
+		<label>engine</label>
+		<corePart>
+			<def>EngineBody</def>
+			<height>Bottom</height>
+			<depth>Inside</depth>
+			<groups>
+				<li>EngineBody</li>
+			</groups>
+			<parts>
+			</parts>
+		</corePart>
+	</BodyDef>
+
+</BodyDefs>
