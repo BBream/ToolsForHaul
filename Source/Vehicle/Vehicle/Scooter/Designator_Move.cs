@@ -36,7 +36,7 @@ namespace Vehicle
 
         public override void DesignateSingleCell(IntVec3 c)
         {
-            vehicle.autoDismountTick = vehicle.thresholdAutoDismount;
+            vehicle.autoDismountTick = Vehicle.ThresholdAutoDismount;
             Job job = new Job(JobDefOf.Goto, c);
             vehicle.driver.DrivingWorker.jobs.StartJob(job,JobCondition.Incompletable);
 

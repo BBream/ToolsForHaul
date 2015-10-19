@@ -15,11 +15,10 @@ namespace Vehicle
 
         #region Variables and short method
         // ==================================
+        public const int ThresholdAutoDismount = 4800;
 
         public bool visibleInside;
-        public bool isStandby;
         public int autoDismountTick = 0;
-        public int thresholdAutoDismount = 4800;
         public VehicleDef vehicleDef;
 
         //Data of mounting
@@ -72,9 +71,7 @@ namespace Vehicle
             Scribe_Deep.LookDeep<Vehicle_CrewsTracker>(ref crews, "crews");
             Scribe_Collections.LookList<Parts_TurretGun>(ref turretGuns, "turretGuns", LookMode.Deep);
             Scribe_Values.LookValue<bool>(ref visibleInside, "visibleInside");
-            Scribe_Values.LookValue<bool>(ref isStandby, "isStandby");
             Scribe_Values.LookValue<int>(ref autoDismountTick, "autoDismountTick");
-            Scribe_Values.LookValue<int>(ref thresholdAutoDismount, "thresholdAutoDismount");
         }
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
@@ -195,8 +192,8 @@ namespace Vehicle
         public override void PreApplyDamage(DamageInfo dinfo, out bool absorbed)
         {
             base.PreApplyDamage(dinfo, out absorbed);
-            foreach (Parts_TurretGun turretGun in turretGuns)
-                turretGun.PreApplyDamage(dinfo, out absorbed);
+            //foreach (Parts_TurretGun turretGun in turretGuns)
+            //    turretGun.PreApplyDamage(dinfo, out absorbed);
             //Vehicle's brain is mounting point. If it damaged, driver is also damaged.
             //if (dinfo.Part.Value)
             //    dinfo.Part.Value.Injury.Body.
@@ -343,23 +340,26 @@ namespace Vehicle
 
                 yield return fmoMount;
 
-                // order to board
-                FloatMenuOption fmoBoard = new FloatMenuOption();
+                if (vehicleDef.vehicle.maxNumOfBoarding > 0)
+                {
+                    // order to board
+                    FloatMenuOption fmoBoard = new FloatMenuOption();
 
-                fmoBoard.label = "Board on " + this.LabelBase;
-                fmoBoard.priority = MenuOptionPriority.High;
-                fmoBoard.action = () =>
-                {
-                    Job job = new Job(DefDatabase<JobDef>.GetNamed("Board"), this, MountPos);
-                    myPawn.jobs.StartJob(job, JobCondition.InterruptForced);
-                };
-                if (vehicleDef.vehicle.maxNumOfBoarding > 0 && crews.CrewsCount >= vehicleDef.vehicle.maxNumOfBoarding)
-                {
-                    fmoMount.label = "No space for boarding";
-                    fmoMount.Disabled = true;
+                    fmoBoard.label = "Board on " + this.LabelBase;
+                    fmoBoard.priority = MenuOptionPriority.High;
+                    fmoBoard.action = () =>
+                    {
+                        Job job = new Job(DefDatabase<JobDef>.GetNamed("Board"), this, MountPos);
+                        myPawn.jobs.StartJob(job, JobCondition.InterruptForced);
+                    };
+                    if (crews.CrewsCount >= vehicleDef.vehicle.maxNumOfBoarding)
+                    {
+                        fmoMount.label = "No space for boarding";
+                        fmoMount.Disabled = true;
+                    }
+
+                    yield return fmoBoard;
                 }
-
-                yield return fmoBoard;
             }
             else
             {

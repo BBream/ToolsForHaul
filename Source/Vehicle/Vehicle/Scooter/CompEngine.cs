@@ -13,25 +13,47 @@ namespace Vehicle
     class CompEngine : ThingComp
     {
 
-        protected Pawn engine = null;
+        protected Pawn engine;
 
         public Pawn Engine { get { return engine; } }
 
         public CompEngine()
         {
-
+            engine = null;
         }
 
         public override void PostSpawnSetup()
         {
             base.PostSpawnSetup();
-            engine = PawnGenerator.GeneratePawn(DefDatabase<PawnKindDef>.GetNamed("ScooterEngine"), parent.Faction, true);
-            engine.training = null;
-            engine.pather = new Pawn_PathFollower(engine);
-            engine.needs = new Pawn_NeedsTracker(engine);
-            engine.inventory = new Pawn_InventoryTracker(engine);
-            engine.drafter = new Pawn_DraftController(engine);
+            if (engine == null)
+            {
+                engine = PawnGenerator.GeneratePawn(DefDatabase<PawnKindDef>.GetNamed("ScooterEngine"), parent.Faction, true);
+                engine.training = null;
+                engine.pather = new Pawn_PathFollower(engine);
+                engine.jobs = new Pawn_JobTracker(engine);
+                engine.needs = new Pawn_NeedsTracker(engine);
+                engine.drafter = new Pawn_DraftController(engine);
+            }
             GenSpawn.Spawn(engine, parent.Position);
+        }
+
+        public override void PostDeSpawn()
+        {
+            base.PostDeSpawn();
+            if (engine.SpawnedInWorld)
+                engine.DeSpawn();
+            Find.Reservations.ReleaseAllClaimedBy(engine);
+            engine.stances.CancelBusyStanceSoft();
+            engine.jobs.StopAll(false);
+            engine.pather.StopDead();
+            engine.drafter.Drafted = false;
+        }
+
+        public override void PostDestroy(DestroyMode mode = DestroyMode.Vanish)
+        {
+            base.PostDestroy(mode);
+            if (!engine.Destroyed)
+                engine.Destroy(DestroyMode.Vanish);
         }
 
         public override void PostExposeData()

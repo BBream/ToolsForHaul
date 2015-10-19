@@ -12,24 +12,24 @@ namespace Vehicle
 {
     public class Vehicle_DriverTracker : IExposable, IThingContainerOwner
     {
-        private Building_Door lastPassedDoor = null;
         private int tickLastDoorCheck = 0;
         private const int TickCooldownDoorCheck = 96;
         private const int tickCheckDriverInterval = 256;
 
         public Vehicle vehicle;
-        public ThingContainer container;
+        private ThingContainer container;
+        private Pawn driver;
+        private Building_Door lastPassedDoor = null;
 
         public ThingContainer GetContainer() { return this.container; }
         public IntVec3 GetPosition() { return this.vehicle.Position; }
-        public Pawn Driver { get { return this.container.Count > 0 ? this.container[0] as Pawn : null; } }
+        public Pawn Driver { get { return driver; } }
         public Pawn DrivingWorker { get { return vehicle.TryGetComp<CompEngine>() != null ? vehicle.TryGetComp<CompEngine>().Engine : Driver; } }
-        public bool IsMounted { get { return (Driver != null) ? true : false; } }
+        public bool IsMounted { get { return Driver != null; } }
         public Vector3 Position
         {
             get
             {
-                Vector3 mapSize = Find.Map.Size.ToVector3();
                 Vector3 position = DrivingWorker.DrawPos;
                 //No engine
                 if (DrivingWorker == null)
@@ -45,12 +45,15 @@ namespace Vehicle
         public Vehicle_DriverTracker(Vehicle vehicle)
         {
             this.vehicle = vehicle;
+            this.driver = null;
             this.container = new ThingContainer((IThingContainerOwner)this, true);
         }
 
         public void ExposeData()
         {
             Scribe_Deep.LookDeep<ThingContainer>(ref this.container, "container");
+            Scribe_References.LookReference<Vehicle>(ref vehicle, "vehicle");
+            Scribe_References.LookReference<Pawn>(ref driver, "driver");
             Scribe_References.LookReference<Building_Door>(ref lastPassedDoor, "lastPassedDoor");
         }
 
@@ -87,13 +90,13 @@ namespace Vehicle
             {
                 this.DrivingWorker.pather.StopDead();
                 this.DrivingWorker.jobs.StopAll();
+                if (this.container.TryAdd(pawn))
+                {
+                    pawn.holder = this.GetContainer();
+                    pawn.holder.owner = this;
+                }
             }
-
-            if (this.container.TryAdd(pawn))
-            {
-                pawn.holder = this.GetContainer();
-                pawn.holder.owner = this;
-            }
+            this.driver = pawn;
         }
 
         public void Dismount()
@@ -105,10 +108,10 @@ namespace Vehicle
             {
                 this.DrivingWorker.pather.StopDead();
                 this.DrivingWorker.jobs.StopAll();
+                Thing dummy;
+                this.container.TryDrop(Driver, vehicle.MountPos, ThingPlaceMode.Near, out dummy);
             }
-
-            Thing dummy;
-            this.container.TryDrop(Driver, vehicle.MountPos, ThingPlaceMode.Near, out dummy);
+            driver = null;
         }
 
         private void ProcessForDoor()

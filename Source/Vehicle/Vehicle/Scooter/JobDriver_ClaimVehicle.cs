@@ -24,7 +24,7 @@ namespace Vehicle
         {
             string repString;
             if (claiming)
-                repString = "ReportClaiming".Translate(TargetThingA.LabelCap) + " after " + ((float)(this.ticksLeftThisToil)).ToStringApproximateTimePeriod();
+                repString = "ReportClaiming".Translate(TargetThingA.LabelCap) + " in " + ((float)(this.ticksLeftThisToil/60f)).ToString("F1") + " second";
             else
                 repString = "ReportClaiming".Translate(TargetThingA.LabelCap);
 

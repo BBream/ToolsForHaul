@@ -7,24 +7,9 @@
     <selectable>false</selectable>
     <tickerType>Normal</tickerType>
     <altitudeLayer>Floor</altitudeLayer>
-    <useHitPoints>false</useHitPoints>
-    <hasTooltip>true</hasTooltip>
+    <useHitPoints>true</useHitPoints>
+    <hasTooltip>false</hasTooltip>
     <soundImpactDefault>BulletImpactFlesh</soundImpactDefault>
-    <inspectorTabs>
-      <li>ITab_Pawn_Health</li>
-      <li>ITab_Pawn_Needs</li>
-      <li>ITab_Pawn_Character</li>
-      <li>ITab_Pawn_Training</li>
-      <li>ITab_Pawn_Gear</li>
-      <li>ITab_Pawn_Guest</li>
-      <li>ITab_Pawn_Prisoner</li>
-    </inspectorTabs>
-    <comps>
-      <li>
-        <compClass>CompAttachBase</compClass>
-      </li>
-    </comps>
-    <drawGUIOverlay>false</drawGUIOverlay>
   </ThingDef>
   
   
@@ -34,6 +19,7 @@
     <drawerType>None</drawerType>
     <soundImpactDefault>BulletImpactMetal</soundImpactDefault>
     <statBases>
+      <MaxHitPoints>9999</MaxHitPoints>
       <Flammability>0.5</Flammability>
       <ComfyTemperatureMin>-100</ComfyTemperatureMin>
       <ComfyTemperatureMax>250</ComfyTemperatureMax>
@@ -89,9 +75,9 @@
           <minAge>0</minAge>
         </li>
       </lifeStageAges>
-      <soundMeleeHitPawn>Pawn_Melee_MechanoidBash_HitPawn</soundMeleeHitPawn>
-      <soundMeleeHitBuilding>Pawn_Melee_MechanoidBash_HitBuilding</soundMeleeHitBuilding>
-      <soundMeleeMiss>Pawn_Melee_MechanoidBash_Miss</soundMeleeMiss>
+      <soundMeleeHitPawn>BulletImpactMetal</soundMeleeHitPawn>
+      <soundMeleeHitBuilding>BulletImpactMetal</soundMeleeHitBuilding>
+      <soundMeleeMiss>BulletImpactMetal</soundMeleeMiss>
     </race>
     <size>(1,1)</size>
   </ThingDef>
