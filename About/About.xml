@@ -5,7 +5,7 @@
 	<targetVersion>Alpha 12d</targetVersion>
 	<description>
   https://ludeon.com/forums/index.php?topic=12282.0
-	Version V1.5a
+	Version V1.5d
 	
   Contents List:
 	- Cart for hauling
@@ -13,6 +13,9 @@
   - Saddle for rider
 		
   Change Log
+  V1.5d
+  - Finding items logic is changed.
+  
   V1.5c
   - Now cart's maximum item become 4.
   - Backpack's maximum stack is 50 per item. 

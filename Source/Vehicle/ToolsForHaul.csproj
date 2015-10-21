@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="Backpack\Apparel_Backpack.cs" />
     <Compile Include="ToolsForHaulUtility.cs" />
+    <Compile Include="Trace.cs" />
     <Compile Include="Vehicle\Cart\JobDriver_Standby.cs" />
     <Compile Include="Vehicle\Cart\JobDriver_HaulWithAnimalCart.cs" />
     <Compile Include="Vehicle\Cart\Toils_Cart.cs" />
@@ -74,7 +75,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Vehicle\JobDriver_Board.cs" />
-    <Compile Include="Vehicle\JobDriver_DismountInBase.cs" />
+    <Compile Include="Vehicle\Cart\JobDriver_DismountInBase.cs" />
     <Compile Include="Backpack\JobDriver_HaulWithBackpack.cs" />
     <Compile Include="Vehicle\JobDriver_MakeMount.cs" />
     <Compile Include="Vehicle\JobDriver_Mount.cs" />

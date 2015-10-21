@@ -19,9 +19,7 @@ namespace ToolsForHaul
 
         public override bool ShouldSkip(Pawn pawn)
         {
-            #if DEBUG
-            ToolsForHaulUtility.DebugWriteHaulingPawn(pawn);
-            #endif
+            Trace.DebugWriteHaulingPawn(pawn);
             if (ToolsForHaulUtility.Cart().Count == 0)
                 return true;
             return false;
@@ -42,6 +40,11 @@ namespace ToolsForHaul
             if (ListerHaulables.ThingsPotentiallyNeedingHauling().Count == 0 && cart.storage.Count == 0)
             {
                 JobFailReason.Is(ToolsForHaulUtility.NoHaulable);
+                return (Job)null;
+            }
+            if (Find.SlotGroupManager.AllGroupsListInPriorityOrder.Count == 0)
+            {
+                JobFailReason.Is(ToolsForHaulUtility.NoEmptyPlaceLowerTrans);
                 return (Job)null;
             }
             if (ToolsForHaulUtility.AvailableAnimalCart(cart) || ToolsForHaulUtility.AvailableCart(cart, pawn))

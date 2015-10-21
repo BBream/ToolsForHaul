@@ -19,9 +19,7 @@ namespace ToolsForHaul
 
         public override bool ShouldSkip(Pawn pawn)
         {
-            #if DEBUG
-            ToolsForHaulUtility.DebugWriteHaulingPawn(pawn);
-            #endif
+            Trace.DebugWriteHaulingPawn(pawn);
             //Don't have haulables.
             if (ListerHaulables.ThingsPotentiallyNeedingHauling().Count == 0)
                 return true;

@@ -96,6 +96,7 @@ namespace ToolsForHaul
                         if (regions[regionInd].extentsClose.Center.InHorDistOf(cart.Position, NearbyCell + RegionCellOffset))
                         {
                             IntVec3 foundCell = IntVec3.Invalid;
+                            IntVec3 distCell = (regionInd > 0)? regions[regionInd - 1].extentsClose.Center : cart.Position;
                             float distFoundCell = float.MaxValue;
                             foreach (IntVec3 cell in regions[regionInd].Cells)
                             {
@@ -104,10 +105,10 @@ namespace ToolsForHaul
                                 && !GenAdj.CellsAdjacentCardinal(cell, Rot4.North, IntVec2.One).Any(cardinal => cardinal.GetEdifice() is Building_Door)
                                 && ReservationUtility.CanReserveAndReach(actor, cell, PathEndMode.ClosestTouch, DangerUtility.NormalMaxDanger(actor)))
                                 {
-                                    if (regions[(regionInd > 0)? regionInd - 1: 0].extentsClose.Center.DistanceToSquared(cell) < distFoundCell)
+                                    if (distCell.DistanceToSquared(cell) < distFoundCell)
                                     {
                                         foundCell = cell;
-                                        distFoundCell = regions[(regionInd > 0) ? regionInd - 1 : 0].extentsClose.Center.DistanceToSquared(cell);
+                                        distFoundCell = distCell.DistanceToSquared(cell);
                                         flag1 = true;
                                     }
                                 }

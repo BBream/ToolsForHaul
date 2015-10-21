@@ -67,6 +67,7 @@ namespace ToolsForHaul
             ///
 
             Toil findStoreCellForCart = Toils_Cart.FindStoreCellForCart(CartInd);
+            Toil checkCartEmpty = Toils_Jump.JumpIf(findStoreCellForCart, () => cart.storage.Count <= 0);
             Toil checkStoreCellEmpty = Toils_Jump.JumpIf(findStoreCellForCart, () => CurJob.GetTargetQueue(StoreCellInd).NullOrEmpty());
             Toil checkHaulableEmpty = Toils_Jump.JumpIf(checkStoreCellEmpty, () => CurJob.GetTargetQueue(HaulableInd).NullOrEmpty());
 
@@ -110,6 +111,8 @@ namespace ToolsForHaul
 
             //Drop TargetQueue
             {
+                yield return checkCartEmpty;
+
                 Toil extractB = Toils_Collect.Extract(StoreCellInd);
                 yield return extractB;
 
@@ -117,7 +120,7 @@ namespace ToolsForHaul
 
                 yield return Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, CartInd);
 
-                yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, extractB);
+                yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, checkCartEmpty);
             }
 
             yield return findStoreCellForCart;
