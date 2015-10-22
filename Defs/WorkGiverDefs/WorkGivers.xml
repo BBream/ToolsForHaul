@@ -28,31 +28,5 @@
       <li>Manipulation</li>
     </requiredCapacities>
   </WorkGiverDef>
-  
- <!--  <WorkGiverDef>
-    <defName>HaulWithTools</defName>
-    <giverClass>ToolsForHaul.WorkGiver_HaulWithTools</giverClass>
-    <workType>Hauling</workType>
-    <priorityInType>15</priorityInType>
-    <verb>haul with tools</verb>
-    <gerund>hauling with tools</gerund>
-    <requiredCapacities>
-      <li>Manipulation</li>
-    </requiredCapacities>
-  </WorkGiverDef> -->
-  
-  <!-- <WorkGiverDef>
-    <defName>DismountInBase</defName>
-    <giverClass>ToolsForHaul.WorkGiver_DismountInBase</giverClass>
-    <workType>Hauling</workType>
-    <priorityInType>3</priorityInType>
-    <scanThings>true</scanThings>
-    <verb>haul</verb>
-    <gerund>hauling</gerund>
-    <requiredCapacities>
-      <li>Manipulation</li>
-    </requiredCapacities>
-  </WorkGiverDef> -->
-
 
 </WorkGivers>

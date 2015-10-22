@@ -96,12 +96,13 @@ namespace ToolsForHaul
                 Toil extractA = Toils_Collect.Extract(HaulableInd);
                 yield return extractA;
 
-                yield return Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
-                                              .FailOnDestroyed(HaulableInd);
+                Toil gotoThing = Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
+                                                    .FailOnDestroyed(HaulableInd);
+                yield return gotoThing;
 
                 yield return Toils_Collect.CollectInCarrier(CartInd, HaulableInd);
 
-                yield return Toils_Collect.CheckDuplicates(extractA, CartInd, HaulableInd);
+                yield return Toils_Collect.CheckDuplicates(gotoThing, CartInd, HaulableInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(HaulableInd, extractA);
             }
@@ -116,11 +117,14 @@ namespace ToolsForHaul
                 Toil extractB = Toils_Collect.Extract(StoreCellInd);
                 yield return extractB;
 
-                yield return Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch);
+                Toil gotoCell = Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch);
+                yield return gotoCell;
 
                 yield return Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, CartInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, checkCartEmpty);
+
+                yield return Toils_Collect.CheckNeedStorageCell(gotoCell, CartInd, StoreCellInd);
             }
 
             yield return findStoreCellForCart;

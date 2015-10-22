@@ -64,25 +64,5 @@
     <driverClass>ToolsForHaul.JobDriver_Standby</driverClass>
     <reportString>Standing by</reportString>
   </JobDef>
-  
-<!-- 
-  <JobDef>
-    <defName>CollectThing</defName>
-    <driverClass>ToolsForHaul.JobDriver_CollectThing</driverClass>
-    <reportString>Collecting TargetA.</reportString>
-  </JobDef>
-
-  <JobDef>
-    <defName>DropAllInCell</defName>
-    <driverClass>ToolsForHaul.JobDriver_DropAllInCell</driverClass>
-    <reportString>DropAllIn TargetA.</reportString>
-  </JobDef>
-  
-  <JobDef>
-    <defName>DropInCell</defName>
-    <driverClass>ToolsForHaul.JobDriver_DropInCell</driverClass>
-    <reportString>DropIn TargetA.</reportString>
-  </JobDef> 
--->
-  
+ 
 </JobDefs>

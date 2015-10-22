@@ -45,7 +45,7 @@ namespace ToolsForHaul
                     Mathf.CeilToInt(mountableComp.Driver.BodySize * MaxItemPerBodySize) : DefaultMaxItem; 
             } 
         }
-        public int GetMaxStackCount { get { return MaxItem * 100; } }
+        public int MaxStack { get { return MaxItem * 100; } }
 
         #endregion
 
@@ -168,7 +168,11 @@ namespace ToolsForHaul
             {
                 if (!mountableComp.IsMounted || !this.SpawnedInWorld)
                     return base.DrawPos;
-                return mountableComp.Position;
+                Vector2 drawSize = mountableComp.Driver.drawer.renderer.graphics.nakedGraphic.drawSize;
+                float factor = (drawSize.x - 1f);
+                factor *= (mountableComp.Driver.Rotation.AsInt % 2 == 1 ? 0.5f : 0.25f);
+                Vector3 offset = new Vector3(0f, 0f, - factor);
+                return mountableComp.Position + offset.RotatedBy(mountableComp.Driver.Rotation.AsAngle);
             }
         }
 

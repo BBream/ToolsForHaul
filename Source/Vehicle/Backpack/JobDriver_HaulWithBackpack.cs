@@ -80,12 +80,13 @@ namespace ToolsForHaul
                 Toil extractA = Toils_Collect.Extract(HaulableInd);
                 yield return extractA;
 
-                yield return Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
-                                              .FailOnDestroyed(HaulableInd);
+                Toil gotoThing = Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
+                                                    .FailOnDestroyed(HaulableInd);
+                yield return gotoThing;
 
                 yield return ToolsForHaul.Toils_Collect.CollectInInventory(HaulableInd);
 
-                yield return Toils_Collect.CheckDuplicates(extractA, BackpackInd, HaulableInd);
+                yield return Toils_Collect.CheckDuplicates(gotoThing, BackpackInd, HaulableInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(HaulableInd, extractA);
             }

@@ -1,4 +1,4 @@
-﻿#define DEBUG
+﻿//#define DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace ToolsForHaul
         private static readonly JobDef jobDefHaulWithAnimalCart = DefDatabase<JobDef>.GetNamed("HaulWithAnimalCart");
         private static readonly JobDef jobDefHaulWithCart = DefDatabase<JobDef>.GetNamed("HaulWithCart");
         private static readonly JobDef jobDefDismountInBase = DefDatabase<JobDef>.GetNamed("DismountInBase");
-        private const int NearbyCell = 10;
+        private const double ValidDistance = 30;
 
         static ToolsForHaulUtility()
         {
@@ -48,11 +48,19 @@ namespace ToolsForHaul
             if (backpack == null)
                 return null;
             Thing lastItem = null;
+            int lastItemInd = -1;
             Thing foodInInventory = FoodUtility.FoodInInventory(pawn);
-            if (pawn.inventory.container.Count > 0 && backpack.numOfSavedItems > 0)
-                lastItem = pawn.inventory.container[((backpack.numOfSavedItems > pawn.inventory.container.Count)?pawn.inventory.container.Count : backpack.numOfSavedItems) - 1];
-            if (foodInInventory != null && backpack.numOfSavedItems < pawn.inventory.container.Count)
-                lastItem = foodInInventory;
+            if (pawn.inventory.container.Count > 0)
+            {
+                if (backpack.numOfSavedItems > 0)
+                {
+                    lastItemInd = ((backpack.numOfSavedItems >= pawn.inventory.container.Count)?pawn.inventory.container.Count : backpack.numOfSavedItems) - 1;
+                    lastItem = pawn.inventory.container[lastItemInd];
+                }
+                if (foodInInventory != null && backpack.numOfSavedItems < pawn.inventory.container.Count
+                    && pawn.inventory.container[lastItemInd + 1] == foodInInventory)
+                    lastItem = foodInInventory;
+            }
             return lastItem;
         }
 
@@ -71,7 +79,7 @@ namespace ToolsForHaul
         }
         public static Job HaulWithTools(Pawn pawn, Vehicle_Cart cart = null)
         {
-            Trace.stopWatch.Start();
+            Trace.stopWatchStart();
 
             //Job Setting
             JobDef jobDef;
@@ -87,7 +95,7 @@ namespace ToolsForHaul
                 Apparel_Backpack backpack = ToolsForHaulUtility.TryGetBackpack(pawn);
                 jobDef = jobDefHaulWithBackpack;
                 targetC = backpack;
-                maxItem = backpack.maxItem;
+                maxItem = backpack.MaxItem;
                 thresholdItem = (int)Math.Ceiling(maxItem * 0.5);
                 reservedMaxItem = pawn.inventory.container.Count;
                 remainingItems = pawn.inventory.container;
@@ -155,7 +163,6 @@ namespace ToolsForHaul
 
             //Collect item
             Trace.AppendLine("Start Collect item");
-            const double ValidDistance = 30;
             IntVec3 searchPos = (cart != null) ? cart.Position : pawn.Position;
             bool flag1 = false;
             foreach (SlotGroup slotGroup in Find.SlotGroupManager.AllGroupsListInPriorityOrder)
@@ -206,7 +213,7 @@ namespace ToolsForHaul
 
                     //Find storage cell
                     Trace.AppendLine("Start Finding storage cell");
-                    if (reservedMaxItem + job.targetQueueA.Count >= thresholdItem)
+                    if (reservedMaxItem + job.targetQueueA.Count > thresholdItem)
                     {
                         List<IntVec3> availableCells = new List<IntVec3>();
                         foreach (IntVec3 cell in slotGroup.CellsList.Where(cell => ReservationUtility.CanReserve(pawn, cell) && cell.Standable() && cell.GetStorable() == null))
@@ -225,7 +232,7 @@ namespace ToolsForHaul
                     break;
             }
             Trace.AppendLine("Elapsed Time");
-            Trace.stopWatch.Stop();
+            Trace.stopWatchStop();
             
             //Check job is valid
             if (!job.targetQueueA.NullOrEmpty() && reservedMaxItem + job.targetQueueA.Count > thresholdItem
@@ -269,13 +276,13 @@ namespace ToolsForHaul
             return (Job)null;
         }
 
-        private static IntVec3 FindStorageCell(Pawn pawn, Thing closestHaulable, List<TargetInfo> targetQueue = null)
+        public static IntVec3 FindStorageCell(Pawn pawn, Thing haulable, List<TargetInfo> targetQueue = null)
         {
             //Find closest cell in queue.
             if (!targetQueue.NullOrEmpty())
                 foreach (TargetInfo target in targetQueue)
                     foreach (IntVec3 adjCell in GenAdjFast.AdjacentCells8Way(target))
-                        if (!targetQueue.Contains(adjCell) && adjCell.IsValidStorageFor(closestHaulable) && pawn.CanReserve(adjCell))
+                        if (!targetQueue.Contains(adjCell) && adjCell.IsValidStorageFor(haulable) && pawn.CanReserve(adjCell))
                             return adjCell;
             /*
             StoragePriority currentPriority = HaulAIUtility.StoragePriorityAtFor(closestHaulable.Position, closestHaulable);
@@ -284,14 +291,15 @@ namespace ToolsForHaul
                 return foundCell;
             */
             //Vanilla code is not worked item on container.
-            StoragePriority currentPriority = HaulAIUtility.StoragePriorityAtFor(closestHaulable.Position, closestHaulable);
+            StoragePriority currentPriority = HaulAIUtility.StoragePriorityAtFor(haulable.Position, haulable);
             foreach (SlotGroup slotGroup in Find.SlotGroupManager.AllGroupsListInPriorityOrder)
             {
                 if (slotGroup.Settings.Priority < currentPriority)
                     break;
                 foreach (IntVec3 cell in slotGroup.CellsList)
                     if (((!targetQueue.NullOrEmpty() && !targetQueue.Contains(cell)) || targetQueue.NullOrEmpty())
-                        && slotGroup.Settings.AllowedToAccept(closestHaulable)
+                        && cell.GetStorable() == null
+                        && slotGroup.Settings.AllowedToAccept(haulable)
                         && pawn.CanReserve(cell))
                         return cell;
             }

@@ -12,7 +12,7 @@ using RimWorld;
 namespace ToolsForHaul{
 public static class Toils_Collect
 {
-    private const int NearbyCell = 5;
+    private const int NearbyCell = 30;
 
     public static Toil Extract(TargetIndex ind)
     {
@@ -29,6 +29,7 @@ public static class Toils_Collect
         return toil;
     }
 
+    #region Toil Collect
     public static Toil CheckDuplicates(Toil jumpToil, TargetIndex CarrierInd, TargetIndex HaulableInd)
     {
         Toil toil = new Toil();
@@ -36,35 +37,50 @@ public static class Toils_Collect
         {
             IntVec3 storeCell = IntVec3.Invalid;
             Pawn actor = toil.GetActor();
+
+            TargetInfo target = toil.actor.jobs.curJob.GetTarget(HaulableInd);
+            if (target.Thing.def.stackLimit <= 1) 
+                return;
+            List<TargetInfo> targetQueue = toil.actor.jobs.curJob.GetTargetQueue(HaulableInd);
+            if (!targetQueue.NullOrEmpty() && target.Thing.def.defName == targetQueue.First().Thing.def.defName)
+            {
+                toil.actor.jobs.curJob.SetTarget(HaulableInd, targetQueue.First());
+                Find.Reservations.Reserve(actor, targetQueue.First());
+                targetQueue.RemoveAt(0);
+                toil.actor.jobs.curDriver.JumpToToil(jumpToil);
+                return;
+            }
             Vehicle_Cart cart = toil.actor.jobs.curJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
             Apparel_Backpack backpack = toil.actor.jobs.curJob.GetTarget(CarrierInd).Thing as Apparel_Backpack;
-            TargetInfo target = toil.actor.jobs.curJob.GetTarget(HaulableInd);
-            List<TargetInfo> targetQueue = toil.actor.jobs.curJob.GetTargetQueue(HaulableInd);
             if (cart == null && backpack == null)
             {
                 Log.Error(actor.LabelCap + " Report: Don't have Carrier");
                 toil.actor.jobs.curDriver.EndJobWith(JobCondition.Errored);
+                return;
             }
+            int curItemCount = (cart != null ? cart.storage.Count : actor.inventory.container.Count) + targetQueue.Count;
+            int curItemStack = (cart != null ? cart.storage.TotalStackCount : actor.inventory.container.TotalStackCount) 
+                                + targetQueue.Sum(item => item.Thing.stackCount);
+            int maxItem = cart != null ? cart.MaxItem : backpack.MaxItem;
+            int maxStack = cart != null ? cart.MaxStack : backpack.MaxStack;
+            if (curItemCount >= maxItem || curItemStack >= maxStack)
+                return;
+            //Check target's nearby
             Thing thing = GenClosest.ClosestThing_Global_Reachable(actor.Position,
                                                                     ListerHaulables.ThingsPotentiallyNeedingHauling(),
                                                                     PathEndMode.Touch,
                                                                     TraverseParms.For(actor, Danger.Some),
                                                                     NearbyCell,
-                                                                    t => t.def.defName == target.Thing.def.defName && !targetQueue.Contains(t));
-
-            if (thing != null && Find.Reservations.CanReserve(actor, thing))
+                                                                    item => !targetQueue.Contains(item)
+                                                                        && item.def.defName == target.Thing.def.defName
+                                                                        && !FireUtility.IsBurning(item)
+                                                                        && Find.Reservations.CanReserve(actor, item));
+            if (thing != null)
             {
-                if ((cart != null && cart.storage.Count + targetQueue.Count < cart.MaxItem
-                    && cart.storage.TotalStackCount + targetQueue.Sum(t => t.Thing.stackCount) < cart.GetMaxStackCount)
-                    ||
-                    (backpack != null && actor.inventory.container.Count + targetQueue.Count < backpack.maxItem
-                    && actor.inventory.container.TotalStackCount + targetQueue.Sum(t => t.Thing.stackCount) < backpack.maxItem * 100)
-                   )
-                {
-                    targetQueue.Add(thing);
-                    Find.Reservations.Reserve(actor, thing);
-                    toil.actor.jobs.curDriver.JumpToToil(jumpToil);
-                }
+                toil.actor.jobs.curJob.SetTarget(HaulableInd, thing);
+                Find.Reservations.Reserve(actor, thing);
+                toil.actor.jobs.curDriver.JumpToToil(jumpToil);
+                return;
             }
         };
         return toil;
@@ -162,7 +178,6 @@ public static class Toils_Collect
             for (int i = 0; i < thingList.Count; i++)
                 if (actor.Position.AdjacentTo8Way(thingList[i].Thing.Position))
                 {
-                    Find.DesignationManager.RemoveAllDesignationsOn(thingList[i].Thing);
                     if (carrier.storage.TryAdd(thingList[i].Thing))
                     {
                         thingList[i].Thing.holder = carrier.GetContainer();
@@ -188,10 +203,37 @@ public static class Toils_Collect
         toil.FailOnDespawned(CarrierInd);
         return toil;
     }
+    #endregion
 
-    /////////////
-    //Toil Drop//
-    /////////////
+    #region Toil Drop
+    public static Toil CheckNeedStorageCell(Toil jumpToil, TargetIndex CarrierInd, TargetIndex StoreCellInd)
+    {
+        Toil toil = new Toil();
+        toil.initAction = () =>
+        {
+            Pawn actor = toil.actor;
+
+            Vehicle_Cart cart = toil.actor.jobs.curJob.GetTarget(CarrierInd).Thing as Vehicle_Cart;
+            Apparel_Backpack backpack = toil.actor.jobs.curJob.GetTarget(CarrierInd).Thing as Apparel_Backpack;
+            if (cart == null && backpack == null)
+            {
+                Log.Error(actor.LabelCap + " Report: Don't have Carrier");
+                toil.actor.jobs.curDriver.EndJobWith(JobCondition.Errored);
+            }
+            ThingContainer container = cart != null ? cart.storage : actor.inventory.container;
+            if (container.Count == 0)
+                return;
+
+            IntVec3 cell = ToolsForHaulUtility.FindStorageCell(actor, container.First());
+            if (cell != IntVec3.Invalid)
+            {
+                toil.actor.jobs.curJob.SetTarget(StoreCellInd, cell);
+                Find.Reservations.Reserve(actor, cell);
+                toil.actor.jobs.curDriver.JumpToToil(jumpToil);
+            }
+        };
+        return toil;
+    }
 
     public static Toil DropTheCarriedInCell(TargetIndex StoreCellInd, ThingPlaceMode placeMode)
     {
@@ -207,8 +249,11 @@ public static class Toils_Collect
             IntVec3 destLoc = actor.jobs.curJob.GetTarget(StoreCellInd).Cell;
             Thing dummy;
 
-            Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
-            actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
+            if (destLoc.GetStorable() == null)
+            {
+                Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
+                actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
+            }
 
             //Check cell queue is adjacent
             List<TargetInfo> cells = curJob.GetTargetQueue(StoreCellInd);
@@ -223,7 +268,10 @@ public static class Toils_Collect
             //Check item queue is valid storage for adjacent cell
             foreach (IntVec3 adjCell in GenAdj.CellsAdjacent8Way(destLoc))
                 if (actor.inventory.container.Count > 0 && adjCell.GetStorable() == null && StoreUtility.IsValidStorageFor(adjCell, actor.inventory.container.First()))
+                {
+                    Find.DesignationManager.RemoveAllDesignationsOn(actor.inventory.container.First());
                     actor.inventory.container.TryDrop(actor.inventory.container.First(), adjCell, ThingPlaceMode.Direct, out dummy);
+                }
         };
         return toil;
     }
@@ -241,16 +289,11 @@ public static class Toils_Collect
             //Check dropThing is last item that should not be dropped
             Thing dropThing = null;
             if (lastItem != null)
-            {
                 for (int i = 0; i + 1 < actor.inventory.container.Count; i++)
                     if (actor.inventory.container[i] == lastItem)
                         dropThing = actor.inventory.container[i + 1];
-            }
-            else if (lastItem == null && actor.inventory.container.Count >= 1)
-            {
-                toil.actor.jobs.curJob.SetTarget(TargetIndex.A, actor.inventory.container.First());
-                dropThing = toil.actor.jobs.curJob.targetA.Thing;
-            }
+            else if (lastItem == null && actor.inventory.container.Count > 0)
+                dropThing = actor.inventory.container.First();
 
             if (dropThing == null)
             {
@@ -260,8 +303,11 @@ public static class Toils_Collect
             IntVec3 destLoc = actor.jobs.curJob.GetTarget(StoreCellInd).Cell;
             Thing dummy;
 
-            Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
-            actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
+            if (destLoc.GetStorable() == null)
+            {
+                Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
+                actor.inventory.container.TryDrop(dropThing, destLoc, placeMode, out dummy);
+            }
         };
         return toil;
     }
@@ -281,8 +327,11 @@ public static class Toils_Collect
             IntVec3 destLoc = actor.jobs.curJob.GetTarget(StoreCellInd).Cell;
             Thing dummy;
 
-            Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
-            carrier.storage.TryDrop(dropThing, destLoc, placeMode, out dummy);
+            if (destLoc.GetStorable() == null)
+            {
+                Find.DesignationManager.RemoveAllDesignationsOn(dropThing);
+                carrier.storage.TryDrop(dropThing, destLoc, placeMode, out dummy);
+            }
 
             //Check cell queue is adjacent
             List<TargetInfo> cells = curJob.GetTargetQueue(StoreCellInd);
@@ -297,7 +346,10 @@ public static class Toils_Collect
             //Check item queue is valid storage for adjacent cell
             foreach (IntVec3 adjCell in GenAdj.CellsAdjacent8Way(destLoc))
                 if (carrier.storage.Count > 0 && adjCell.GetStorable() == null && StoreUtility.IsValidStorageFor(adjCell, carrier.storage.First()))
+                {
+                    Find.DesignationManager.RemoveAllDesignationsOn(carrier.storage.First());
                     carrier.storage.TryDrop(carrier.storage.First(), adjCell, ThingPlaceMode.Direct, out dummy);
+                }
         };
         toil.FailOnDespawned(CarrierInd);
         return toil;
@@ -316,6 +368,6 @@ public static class Toils_Collect
         };
         return toil;
     }
-                
+    #endregion
 }}
 

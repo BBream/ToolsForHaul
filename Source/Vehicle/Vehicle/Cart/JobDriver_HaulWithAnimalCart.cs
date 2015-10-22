@@ -92,8 +92,9 @@ namespace ToolsForHaul
                 Toil extractA = Toils_Collect.Extract(HaulableInd);
                 yield return extractA;
 
-                yield return Toils_Cart.CallAnimalCart(CartInd, HaulableInd)
-                                            .FailOnDestroyed(HaulableInd);
+                Toil callAnimalCartForCollect = Toils_Cart.CallAnimalCart(CartInd, HaulableInd)
+                                                                .FailOnDestroyed(HaulableInd);
+                yield return callAnimalCartForCollect;
 
                 yield return Toils_Goto.GotoThing(HaulableInd, PathEndMode.ClosestTouch)
                                               .FailOnDestroyed(HaulableInd);
@@ -102,7 +103,7 @@ namespace ToolsForHaul
 
                 yield return Toils_Collect.CollectInCarrier(CartInd, HaulableInd);
 
-                yield return Toils_Collect.CheckDuplicates(extractA, CartInd, HaulableInd);
+                yield return Toils_Collect.CheckDuplicates(callAnimalCartForCollect, CartInd, HaulableInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(HaulableInd, extractA);
             }
@@ -117,7 +118,8 @@ namespace ToolsForHaul
                 Toil extractB = Toils_Collect.Extract(StoreCellInd);
                 yield return extractB;
 
-                yield return Toils_Cart.CallAnimalCart(CartInd, StoreCellInd);
+                Toil callAnimalCartForDrop = Toils_Cart.CallAnimalCart(CartInd, StoreCellInd);
+                yield return callAnimalCartForDrop;
 
                 yield return Toils_Goto.GotoCell(StoreCellInd, PathEndMode.ClosestTouch)
                                             .FailOnBurningImmobile(StoreCellInd);
@@ -127,6 +129,8 @@ namespace ToolsForHaul
                 yield return Toils_Collect.DropTheCarriedInCell(StoreCellInd, ThingPlaceMode.Direct, CartInd);
 
                 yield return Toils_Jump.JumpIfHaveTargetInQueue(StoreCellInd, checkCartEmpty);
+
+                yield return Toils_Collect.CheckNeedStorageCell(callAnimalCartForDrop, CartInd, StoreCellInd);
             }
 
             yield return releaseAnimalCart;

@@ -73,7 +73,7 @@ namespace ToolsForHaul
             //Draw Gizmo
             for (int i = 0;i < numOfMaxItemsPerRow * numOfRow; i++)
             {
-                if ( i >= backpack.maxItem )
+                if ( i >= backpack.MaxItem )
                 {
                     thingIconRect.x = topLeft.x + widthPerItem * (i % numOfMaxItemsPerRow);
                     thingIconRect.y = topLeft.y + (Height / 2) * (i / numOfMaxItemsPerRow);

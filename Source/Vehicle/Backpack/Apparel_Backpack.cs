@@ -28,11 +28,12 @@ namespace ToolsForHaul
         private static string DesignatorPutInInventoryDefaultDesc = Translator.Translate("DesignatorPutInDefaultDesc");
         private static readonly StatDef backpackMaxItem = DefDatabase<StatDef>.GetNamed("BackpackMaxItem");
 
-        public int maxItem;
+        public int maxItem; //obsoleted
         public int numOfSavedItems;
         public Pawn postWearer;
 
-        public int maxStack { get { return maxItem * 50; } }
+        public int MaxItem { get { return (int)this.GetStatValue(backpackMaxItem); } }
+        public int MaxStack { get { return maxItem * 50; } }
 
         public Apparel_Backpack() : base()
         {
@@ -84,8 +85,8 @@ namespace ToolsForHaul
 
             designator.backpack = this;
             designator.icon = ContentFinder<Texture2D>.Get("UI/Commands/IconPutIn");
-            designator.defaultLabel = DesignatorPutInInventoryDefaultLabel + "(" + wearer.inventory.container.Count + "/" + maxItem + ")";
-            designator.defaultDesc = DesignatorPutInInventoryDefaultDesc + wearer.inventory.container.Count + "/" + maxItem;
+            designator.defaultLabel = DesignatorPutInInventoryDefaultLabel + "(" + wearer.inventory.container.Count + "/" + MaxItem + ")";
+            designator.defaultDesc = DesignatorPutInInventoryDefaultDesc + wearer.inventory.container.Count + "/" + MaxItem;
             designator.hotKey = KeyBindingDef.Named("CommandPutInInventory");
             designator.activateSound = SoundDef.Named("Click");
 

@@ -41,7 +41,7 @@ namespace ToolsForHaul
 
 
             //Backpack is full.
-            this.FailOn(() =>{ return (pawn.inventory.container.Count < backpack.maxItem) ? false : true; });
+            this.FailOn(() =>{ return (pawn.inventory.container.Count < backpack.MaxItem) ? false : true; });
 
             ///
             //Define Toil
@@ -87,8 +87,8 @@ namespace ToolsForHaul
                 Toil toilPutInInventory = new Toil();
                 toilPutInInventory.initAction = () => 
                 {
-                    if (pawn.inventory.container.Count < backpack.maxItem
-                        && backpack.wearer.inventory.container.TotalStackCount < backpack.maxStack)
+                    if (pawn.inventory.container.Count < backpack.MaxItem
+                        && backpack.wearer.inventory.container.TotalStackCount < backpack.MaxStack)
                     {
                         if (CurJob.targetB.Thing.TryGetComp<CompForbiddable>() != null && CurJob.targetB.Thing.TryGetComp<CompForbiddable>().Forbidden == true)
                             CurJob.targetB.Thing.TryGetComp<CompForbiddable>().Forbidden = false;
@@ -96,7 +96,7 @@ namespace ToolsForHaul
                         {
                             CurJob.targetB.Thing.holder = pawn.inventory.GetContainer();
                             CurJob.targetB.Thing.holder.owner = pawn.inventory;
-                            backpack.numOfSavedItems = pawn.inventory.container.Count;
+                            backpack.numOfSavedItems++;
                         }
                     }
                     else

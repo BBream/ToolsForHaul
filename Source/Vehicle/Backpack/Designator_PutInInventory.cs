@@ -41,8 +41,8 @@ namespace ToolsForHaul
                 designationsTotalStackCount += designation.target.Thing.stackCount;
 
             //No Item space or no stack space
-            if ((designations.Count + numOfContents) >= backpack.maxItem 
-                || (designationsTotalStackCount + backpack.wearer.inventory.container.TotalStackCount) >= backpack.maxStack)
+            if ((designations.Count + numOfContents) >= backpack.MaxItem 
+                || (designationsTotalStackCount + backpack.wearer.inventory.container.TotalStackCount) >= backpack.MaxStack)
                 return new AcceptanceReport(txtBackpackIsFull.Translate());
 
 
